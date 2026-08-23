@@ -100,7 +100,39 @@ elif pagina == "📚 Matérias":
 
     st.header("📚 Minhas matérias")
 
-    st.info("Em breve vamos cadastrar suas matérias aqui! 🌷")
+    st.write("Cadastre suas disciplinas para começar a organizar sua vida acadêmica. 🌷")
+
+    nome = st.text_input("Nome da matéria")
+
+    semestre = st.selectbox(
+        "Semestre",
+        [
+            "1º semestre",
+            "2º semestre",
+            "3º semestre",
+            "4º semestre",
+            "5º semestre",
+            "6º semestre",
+            "7º semestre",
+            "8º semestre"
+        ]
+    )
+
+    professor = st.text_input("Professor(a)")
+
+    if st.button("🌹 Cadastrar matéria"):
+
+        if nome:
+
+            st.success(f"Matéria '{nome}' cadastrada!")
+
+            st.write(f"📚 **Matéria:** {nome}")
+            st.write(f"🎓 **Semestre:** {semestre}")
+            st.write(f"👩‍🏫 **Professor(a):** {professor}")
+
+        else:
+
+            st.warning("Digite o nome da matéria primeiro.")
 
 
 elif pagina == "⏱️ Estudar":
