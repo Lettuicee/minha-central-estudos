@@ -59,6 +59,16 @@ p, div, span, button {
 </style>
 """, unsafe_allow_html=True)
 
+pagina = st.sidebar.radio(
+    "🌹 Minha Central",
+    [
+        "🏠 Início",
+        "📚 Matérias",
+        "⏱️ Estudar",
+        "📊 Estatísticas",
+        "🔗 Meus lugares"
+    ]
+)
 
 st.markdown(
     '<div class="titulo">🌹 Minha Central de Estudos</div>',
