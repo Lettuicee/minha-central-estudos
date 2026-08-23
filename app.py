@@ -81,28 +81,44 @@ st.markdown(
 )
 
 
-col1, col2, col3 = st.columns(3)
+if pagina == "🏠 Início":
 
-with col1:
     st.markdown("""
     <div class="card">
-        <h3>📚 Matérias</h3>
-        <p>Organize suas disciplinas, conteúdos e materiais.</p>
+        <h3>🌹 Bem-vinda</h3>
+        <p>
+        Esse é o seu espaço pessoal de estudos.
+        Aqui você vai organizar matérias, estudar,
+        acompanhar seu progresso e, futuramente,
+        conversar com sua própria IA.
+        </p>
     </div>
     """, unsafe_allow_html=True)
 
-with col2:
-    st.markdown("""
-    <div class="card">
-        <h3>⏱️ Estudar</h3>
-        <p>Registre seu tempo de estudo e acompanhe seu progresso.</p>
-    </div>
-    """, unsafe_allow_html=True)
 
-with col3:
-    st.markdown("""
-    <div class="card">
-        <h3>📊 Estatísticas</h3>
-        <p>Veja seu histórico diário, semanal e mensal.</p>
-    </div>
-    """, unsafe_allow_html=True)
+elif pagina == "📚 Matérias":
+
+    st.header("📚 Minhas matérias")
+
+    st.info("Em breve vamos cadastrar suas matérias aqui! 🌷")
+
+
+elif pagina == "⏱️ Estudar":
+
+    st.header("⏱️ Sessão de estudo")
+
+    st.info("Nosso cronômetro vai ficar aqui. 🕯️")
+
+
+elif pagina == "📊 Estatísticas":
+
+    st.header("📊 Meu progresso")
+
+    st.info("Seus gráficos e estatísticas aparecerão aqui. 📈")
+
+
+elif pagina == "🔗 Meus lugares":
+
+    st.header("🔗 Meus lugares")
+
+    st.info("Aqui vamos colocar seus links para Notion, OneNote, Word, Drive etc. 🌷")
