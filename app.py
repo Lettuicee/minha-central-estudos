@@ -1,5 +1,8 @@
 import streamlit as st
 
+if "materias" not in st.session_state:
+    st.session_state.materias = []
+    
 st.set_page_config(
     page_title="Minha Central de Estudos",
     page_icon="🌹",
@@ -100,39 +103,87 @@ elif pagina == "📚 Matérias":
 
     st.header("📚 Minhas matérias")
 
-    st.write("Cadastre suas disciplinas para começar a organizar sua vida acadêmica. 🌷")
-
-    nome = st.text_input("Nome da matéria")
-
-    semestre = st.selectbox(
-        "Semestre",
-        [
-            "1º semestre",
-            "2º semestre",
-            "3º semestre",
-            "4º semestre",
-            "5º semestre",
-            "6º semestre",
-            "7º semestre",
-            "8º semestre"
-        ]
+    st.write(
+        "Cadastre suas disciplinas para começar "
+        "a organizar sua vida acadêmica. 🌷"
     )
 
-    professor = st.text_input("Professor(a)")
+    with st.form("form_materia"):
 
-    if st.button("🌹 Cadastrar matéria"):
+        nome = st.text_input("Nome da matéria")
 
-        if nome:
+        semestre = st.selectbox(
+            "Semestre",
+            [
+                "1º semestre",
+                "2º semestre",
+                "3º semestre",
+                "4º semestre",
+                "5º semestre",
+                "6º semestre",
+                "7º semestre",
+                "8º semestre"
+            ]
+        )
 
-            st.success(f"Matéria '{nome}' cadastrada!")
+        professor = st.text_input("Professor(a)")
 
-            st.write(f"📚 **Matéria:** {nome}")
-            st.write(f"🎓 **Semestre:** {semestre}")
-            st.write(f"👩‍🏫 **Professor(a):** {professor}")
+        enviar = st.form_submit_button(
+            "🌹 Cadastrar matéria"
+        )
 
-        else:
+        if enviar:
 
-            st.warning("Digite o nome da matéria primeiro.")
+            if nome:
+
+                st.session_state.materias.append({
+                    "nome": nome,
+                    "semestre": semestre,
+                    "professor": professor
+                })
+
+                st.success(
+                    f"'{nome}' foi adicionada! 🌷"
+                )
+
+            else:
+
+                st.warning(
+                    "Digite o nome da matéria primeiro."
+                )
+
+    st.divider()
+
+    st.subheader("📚 Disciplinas cadastradas")
+
+    if st.session_state.materias:
+
+        for materia in st.session_state.materias:
+
+            st.markdown(
+                f"""
+                <div class="card">
+
+                <h3>📚 {materia["nome"]}</h3>
+
+                <p>
+                🎓 {materia["semestre"]}
+                </p>
+
+                <p>
+                👩‍🏫 {materia["professor"] or "Professor não informado"}
+                </p>
+
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+    else:
+
+        st.info(
+            "Você ainda não cadastrou nenhuma matéria."
+        )
 
 
 elif pagina == "⏱️ Estudar":
