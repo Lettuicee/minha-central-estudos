@@ -1,4 +1,10 @@
 import streamlit as st
+from supabase import create_client
+
+supabase = create_client(
+    st.secrets["SUPABASE_URL"],
+    st.secrets["SUPABASE_KEY"]
+)
 
 if "materias" not in st.session_state:
     st.session_state.materias = []
@@ -103,11 +109,6 @@ elif pagina == "📚 Matérias":
 
     st.header("📚 Minhas matérias")
 
-    st.write(
-        "Cadastre suas disciplinas para começar "
-        "a organizar sua vida acadêmica. 🌷"
-    )
-
     with st.form("form_materia"):
 
         nome = st.text_input("Nome da matéria")
@@ -136,15 +137,17 @@ elif pagina == "📚 Matérias":
 
             if nome:
 
-                st.session_state.materias.append({
+                supabase.table("materias").insert({
                     "nome": nome,
                     "semestre": semestre,
                     "professor": professor
-                })
+                }).execute()
 
                 st.success(
-                    f"'{nome}' foi adicionada! 🌷"
+                    f"'{nome}' foi salva permanentemente! 🌷"
                 )
+
+                st.rerun()
 
             else:
 
@@ -156,9 +159,15 @@ elif pagina == "📚 Matérias":
 
     st.subheader("📚 Disciplinas cadastradas")
 
-    if st.session_state.materias:
+    resposta = supabase.table(
+        "materias"
+    ).select("*").execute()
 
-        for materia in st.session_state.materias:
+    materias = resposta.data
+
+    if materias:
+
+        for materia in materias:
 
             st.markdown(
                 f"""
