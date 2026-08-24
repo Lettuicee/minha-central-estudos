@@ -393,6 +393,79 @@ elif pagina == "⏱️ Estudar":
             f"Estudando: {materia_escolhida} 📚"
         )
 
+    st.divider()
+
+    st.subheader("📖 Histórico de estudos")
+
+    try:
+
+        resposta_historico = (
+            supabase
+            .table("sessoes_estudo")
+            .select("*")
+            .order("criado_em", desc=True)
+            .execute()
+        )
+
+        historico = resposta_historico.data
+
+    except Exception as e:
+
+        st.error("Erro ao carregar o histórico:")
+        st.code(str(e))
+
+        historico = []
+
+
+    if historico:
+
+        for sessao in historico:
+
+            segundos = sessao["duracao_segundos"]
+
+            horas = int(segundos // 3600)
+
+            minutos = int(
+                (segundos % 3600) // 60
+            )
+
+            segundos_restantes = int(
+                segundos % 60
+            )
+
+
+            if horas > 0:
+
+                duracao = (
+                    f"{horas}h "
+                    f"{minutos:02d}min"
+                )
+
+            else:
+
+                duracao = (
+                    f"{minutos}min "
+                    f"{segundos_restantes:02d}s"
+                )
+
+
+            st.markdown(
+                f"""
+                **📚 {sessao["materia_nome"]}**
+
+                ⏱️ {duracao}
+
+                🕐 {sessao["criado_em"]}
+
+                ---
+                """
+            )
+
+    else:
+
+        st.info(
+            "Nenhuma sessão de estudo registrada ainda. 🌷"
+        )
 
 elif pagina == "📊 Estatísticas":
 
