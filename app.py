@@ -6,6 +6,8 @@ supabase = create_client(
     st.secrets["SUPABASE_KEY"]
 )
 
+st.write("URL configurada:", st.secrets["SUPABASE_URL"])
+
 if "materias" not in st.session_state:
     st.session_state.materias = []
     
