@@ -159,7 +159,7 @@ elif pagina == "📚 Matérias":
 
     st.subheader("📚 Disciplinas cadastradas")
 
-    try:
+  try:
     resposta = supabase.table("materias").select("*").execute()
     materias = resposta.data
 
