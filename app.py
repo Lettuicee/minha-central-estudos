@@ -469,11 +469,11 @@ elif pagina == "⏱️ Estudar":
                         "saldo_total": novo_saldo
                     }
 
-                st.session_state.cronometro_rodando = False
-                st.session_state.cronometro_inicio = None
-                st.session_state.cronometro_acumulado = 0
-
-                st.rerun()
+                    st.session_state.cronometro_rodando = False
+                    st.session_state.cronometro_inicio = None
+                    st.session_state.cronometro_acumulado = 0
+    
+                    st.rerun()
                 
         mostrar_cronometro()
 
