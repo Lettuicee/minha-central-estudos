@@ -331,20 +331,53 @@ elif pagina == "⏱️ Estudar":
                         st.rerun()
 
 
-            with col3:
+           with col3:
 
-                if st.button(
-                    "■ Zerar",
-                    use_container_width=True
-                ):
+    if st.button(
+        "■ Finalizar",
+        use_container_width=True
+    ):
 
-                    st.session_state.cronometro_rodando = False
+        if st.session_state.cronometro_rodando:
 
-                    st.session_state.cronometro_inicio = None
+            tempo_total = (
+                st.session_state.cronometro_acumulado
+                + time.time()
+                - st.session_state.cronometro_inicio
+            )
 
-                    st.session_state.cronometro_acumulado = 0
+        else:
 
-                    st.rerun()
+            tempo_total = st.session_state.cronometro_acumulado
+
+        if tempo_total > 0:
+
+            materia_atual = next(
+                (
+                    materia
+                    for materia in materias
+                    if materia["nome"] == materia_escolhida
+                ),
+                None
+            )
+
+            supabase.table("sessoes_estudo").insert({
+                "materia_id": materia_atual["id"] if materia_atual else None,
+                "materia_nome": materia_escolhida,
+                "duracao_segundos": int(tempo_total)
+            }).execute()
+
+            minutos = int(tempo_total // 60)
+
+            st.success(
+                f"🎉 Sessão salva! Você estudou {minutos} minutos de {materia_escolhida}."
+            )
+
+        st.session_state.cronometro_rodando = False
+        st.session_state.cronometro_inicio = None
+        st.session_state.cronometro_acumulado = 0
+
+        st.rerun()
 
 
         mostrar_cronometro()
