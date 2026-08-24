@@ -469,7 +469,7 @@ st.markdown(
     """
 )
 
-    else:
+ else:
 
         st.info(
             "Nenhuma sessão de estudo registrada ainda. 🌷"
