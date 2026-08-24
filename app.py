@@ -307,7 +307,7 @@ elif pagina == "⏱️ Estudar":
 
             st.image(
                 "coelhinho.png",
-                width=350
+                width=450
             )
             
         if st.session_state.cronometro_rodando:
