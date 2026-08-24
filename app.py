@@ -80,6 +80,11 @@ p, div, span, button {
     color: #c7b9b0;
 }
 
+/* Esconde o bonequinho/STOP do Streamlit */
+[data-testid="stStatusWidget"] {
+    visibility: hidden;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
