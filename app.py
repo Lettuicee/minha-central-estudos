@@ -18,6 +18,9 @@ if "cronometro_inicio" not in st.session_state:
 if "cronometro_acumulado" not in st.session_state:
     st.session_state.cronometro_acumulado = 0
 
+if "ultima_recompensa" not in st.session_state:
+    st.session_state.ultima_recompensa = None
+    
 if "materias" not in st.session_state:
     st.session_state.materias = []
     
@@ -248,6 +251,30 @@ elif pagina == "⏱️ Estudar":
         unsafe_allow_html=True
     )
 
+    if st.session_state.ultima_recompensa:
+
+        recompensa = st.session_state.ultima_recompensa
+
+        st.success(
+            f"""
+🎉 **Sessão concluída!**
+
+📚 **{recompensa["materia"]}**
+
+⏱️ Você estudou **{recompensa["minutos"]} minutos**
+
+🪙 Você ganhou **+{recompensa["moedas_ganhas"]} moedas!**
+
+💰 Saldo atual: **{recompensa["saldo_total"]} moedas**
+"""
+        )
+
+        if st.button("✨ Fechar recompensa"):
+
+            st.session_state.ultima_recompensa = None
+
+            st.rerun()
+
     resposta = supabase.table("materias").select("*").execute()
     materias = resposta.data
 
@@ -428,20 +455,21 @@ elif pagina == "⏱️ Estudar":
                                 carteira.data[0]["id"]
                             ).execute()
                         
-                        minutos = int(tempo_total // 60)
-    
-                        st.success(
-                            f"🎉 Sessão salva! "
-                            f"Você estudou {minutos} minutos "
-                            f"de {materia_escolhida}."
-                        )
-    
-                    st.session_state.cronometro_rodando = False
-                    st.session_state.cronometro_inicio = None
-                    st.session_state.cronometro_acumulado = 0
-    
-                    st.rerun()
+                    minutos = int(tempo_total // 60)
 
+                    st.session_state.ultima_recompensa = {
+                        "materia": materia_escolhida,
+                        "minutos": minutos,
+                        "moedas_ganhas": moedas_ganhas,
+                        "saldo_total": novo_saldo
+                    }
+
+                st.session_state.cronometro_rodando = False
+                st.session_state.cronometro_inicio = None
+                st.session_state.cronometro_acumulado = 0
+
+                st.rerun()
+                
         mostrar_cronometro()
 
         st.caption(
