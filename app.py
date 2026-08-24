@@ -299,6 +299,17 @@ elif pagina == "⏱️ Estudar":
             nomes_materias
         )
 
+        col_esquerda, col_bichinho, col_direita = st.columns(
+            [1, 2, 1]
+        )
+
+        with col_bichinho:
+
+            st.image(
+                "coelhinho.png",
+                width=180
+            )
+            
         if st.session_state.cronometro_rodando:
 
             run_every = 1
