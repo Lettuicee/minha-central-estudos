@@ -1,6 +1,7 @@
 import streamlit as st
 import time
 from supabase import create_client
+from datetime import datetime
 
 supabase = create_client(
     st.secrets["SUPABASE_URL"],
@@ -448,18 +449,25 @@ elif pagina == "⏱️ Estudar":
                     f"{segundos_restantes:02d}s"
                 )
 
+            data_sessao = datetime.fromisoformat(
+    sessao["criado_em"].replace("Z", "+00:00")
+)
 
-            st.markdown(
-                f"""
-                **📚 {sessao["materia_nome"]}**
+data_formatada = data_sessao.astimezone().strftime(
+    "%d/%m/%Y às %H:%M"
+)
 
-                ⏱️ {duracao}
+           st.markdown(
+    f"""
+    **📚 {sessao["materia_nome"]}**
 
-                🕐 {sessao["criado_em"]}
+    ⏱️ {duracao}
 
-                ---
-                """
-            )
+    🕐 {data_formatada}
+
+    ---
+    """
+)
 
     else:
 
