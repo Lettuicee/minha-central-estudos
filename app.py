@@ -221,6 +221,33 @@ elif pagina == "⏱️ Estudar":
 
     st.header("⏱️ Sessão de estudo")
 
+    carteira = (
+        supabase
+        .table("carteira")
+        .select("moedas")
+        .limit(1)
+        .execute()
+    )
+
+    moedas = (
+        carteira.data[0]["moedas"]
+        if carteira.data
+        else 0
+    )
+
+    st.markdown(
+        f"""
+        <div style="
+            text-align: right;
+            font-size: 22px;
+            margin-bottom: 10px;
+        ">
+            🪙 <b>{moedas}</b>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
     resposta = supabase.table("materias").select("*").execute()
     materias = resposta.data
 
