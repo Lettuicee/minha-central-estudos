@@ -408,7 +408,7 @@ elif pagina == "⏱️ Estudar":
             .execute()
         )
 
-           historico = resposta_historico.data
+        historico = resposta_historico.data
 
     except Exception as e:
 
