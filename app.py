@@ -408,7 +408,7 @@ elif pagina == "⏱️ Estudar":
             .execute()
         )
 
-        historico = resposta_historico.data
+           historico = resposta_historico.data
 
     except Exception as e:
 
@@ -417,62 +417,59 @@ elif pagina == "⏱️ Estudar":
 
         historico = []
 
+    if historico:
 
-                if historico:
-        
-                for sessao in historico:
-        
-                    segundos = sessao["duracao_segundos"]
-        
-                    horas = int(segundos // 3600)
-        
-                    minutos = int(
-                        (segundos % 3600) // 60
-                    )
-        
-                    segundos_restantes = int(
-                        segundos % 60
-                    )
-        
-                    if horas > 0:
-        
-                        duracao = (
-                            f"{horas}h "
-                            f"{minutos:02d}min"
-                        )
-        
-                    else:
-        
-                        duracao = (
-                            f"{minutos}min "
-                            f"{segundos_restantes:02d}s"
-                        )
-        
-                    data_sessao = datetime.fromisoformat(
-                        sessao["criado_em"].replace("Z", "+00:00")
-                    )
-        
-                    data_formatada = data_sessao.astimezone().strftime(
-                        "%d/%m/%Y às %H:%M"
-                    )
-        
-                    st.markdown(
-                        f"""
-                        **📚 {sessao["materia_nome"]}**
-        
-                        ⏱️ {duracao}
-        
-                        🕐 {data_formatada}
-        
-                        ---
-                        """
-                    )
-        
-            else:
-        
-                st.info(
-                    "Nenhuma sessão de estudo registrada ainda. 🌷"
+        for sessao in historico:
+
+            segundos = sessao["duracao_segundos"]
+
+            horas = int(segundos // 3600)
+
+            minutos = int(
+                (segundos % 3600) // 60
+            )
+
+            segundos_restantes = int(segundos % 60)
+
+            if horas > 0:
+
+                duracao = (
+                    f"{horas}h "
+                    f"{minutos:02d}min"
                 )
+
+            else:
+
+                duracao = (
+                    f"{minutos}min "
+                    f"{segundos_restantes:02d}s"
+                )
+
+            data_sessao = datetime.fromisoformat(
+                sessao["criado_em"].replace("Z", "+00:00")
+            )
+
+            data_formatada = data_sessao.astimezone().strftime(
+                "%d/%m/%Y às %H:%M"
+            )
+
+            st.markdown(
+                f"""
+                **📚 {sessao["materia_nome"]}**
+
+                ⏱️ {duracao}
+
+                🕐 {data_formatada}
+
+                ---
+                """
+            )
+
+    else:
+
+        st.info(
+            "Nenhuma sessão de estudo registrada ainda. 🌷"
+        )
         
 elif pagina == "📊 Estatísticas":
 
