@@ -2,6 +2,7 @@ import streamlit as st
 import time
 from supabase import create_client
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 supabase = create_client(
     st.secrets["SUPABASE_URL"],
@@ -445,13 +446,17 @@ elif pagina == "⏱️ Estudar":
                     f"{segundos_restantes:02d}s"
                 )
 
-            data_sessao = datetime.fromisoformat(
-                sessao["criado_em"].replace("Z", "+00:00")
-            )
-
-            data_formatada = data_sessao.astimezone().strftime(
-                "%d/%m/%Y às %H:%M"
-            )
+         data_sessao = datetime.fromisoformat(
+    sessao["criado_em"].replace("Z", "+00:00")
+        )
+        
+        data_sao_paulo = data_sessao.astimezone(
+            ZoneInfo("America/Sao_Paulo")
+        )
+        
+        data_formatada = data_sao_paulo.strftime(
+            "%d/%m/%Y às %H:%M"
+        )
 
             st.markdown(
                 f"""
