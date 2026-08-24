@@ -418,7 +418,7 @@ elif pagina == "⏱️ Estudar":
         historico = []
 
 
-    if historico:
+        if historico:
 
         for sessao in historico:
 
@@ -433,7 +433,6 @@ elif pagina == "⏱️ Estudar":
             segundos_restantes = int(
                 segundos % 60
             )
-
 
             if horas > 0:
 
@@ -450,31 +449,31 @@ elif pagina == "⏱️ Estudar":
                 )
 
             data_sessao = datetime.fromisoformat(
-    sessao["criado_em"].replace("Z", "+00:00")
-)
+                sessao["criado_em"].replace("Z", "+00:00")
+            )
 
-data_formatada = data_sessao.astimezone().strftime(
-    "%d/%m/%Y às %H:%M"
-)
+            data_formatada = data_sessao.astimezone().strftime(
+                "%d/%m/%Y às %H:%M"
+            )
 
-st.markdown(
-    f"""
-    **📚 {sessao["materia_nome"]}**
+            st.markdown(
+                f"""
+                **📚 {sessao["materia_nome"]}**
 
-    ⏱️ {duracao}
+                ⏱️ {duracao}
 
-    🕐 {data_formatada}
+                🕐 {data_formatada}
 
-    ---
-    """
-)
+                ---
+                """
+            )
 
-            else:
-            
-                    st.info(
-                        "Nenhuma sessão de estudo registrada ainda. 🌷"
-                    )
+    else:
 
+        st.info(
+            "Nenhuma sessão de estudo registrada ainda. 🌷"
+        )
+        
 elif pagina == "📊 Estatísticas":
 
     st.header("📊 Meu progresso")
