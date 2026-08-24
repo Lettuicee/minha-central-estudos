@@ -333,9 +333,9 @@ elif pagina == "⏱️ Estudar":
 
             with col3:
 
-                if st.button(
-                    "■ Finalizar",
-                    use_container_width=True
+                    if st.button(
+                        "■ Finalizar",
+                        use_container_width=True
             ):
 
                 if st.session_state.cronometro_rodando:
