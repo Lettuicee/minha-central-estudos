@@ -300,7 +300,7 @@ elif pagina == "⏱️ Estudar":
         )
 
         col_esquerda, col_bichinho, col_direita = st.columns(
-            [1, 2, 1]
+            [1, 4, 1]
         )
 
         with col_bichinho:
