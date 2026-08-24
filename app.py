@@ -446,14 +446,14 @@ elif pagina == "⏱️ Estudar":
                     f"{segundos_restantes:02d}s"
                 )
 
-             data_sessao = datetime.fromisoformat(
-        sessao["criado_em"].replace("Z", "+00:00")
+            data_sessao = datetime.fromisoformat(
+                sessao["criado_em"].replace("Z", "+00:00")
             )
-            
+
             data_sao_paulo = data_sessao.astimezone(
                 ZoneInfo("America/Sao_Paulo")
             )
-            
+
             data_formatada = data_sao_paulo.strftime(
                 "%d/%m/%Y às %H:%M"
             )
