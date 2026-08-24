@@ -457,17 +457,17 @@ data_formatada = data_sessao.astimezone().strftime(
     "%d/%m/%Y às %H:%M"
 )
 
-     st.markdown(
-        f"""
-        **📚 {sessao["materia_nome"]}**
-    
-        ⏱️ {duracao}
-    
-        🕐 {data_formatada}
-    
-        ---
-        """
-    )
+             st.markdown(
+                f"""
+                **📚 {sessao["materia_nome"]}**
+            
+                ⏱️ {duracao}
+            
+                🕐 {data_formatada}
+            
+                ---
+                """
+            )
 
     else:
 
