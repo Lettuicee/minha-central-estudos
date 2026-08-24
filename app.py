@@ -469,11 +469,11 @@ st.markdown(
     """
 )
 
- else:
-
-        st.info(
-            "Nenhuma sessão de estudo registrada ainda. 🌷"
-        )
+            else:
+            
+                    st.info(
+                        "Nenhuma sessão de estudo registrada ainda. 🌷"
+                    )
 
 elif pagina == "📊 Estatísticas":
 
