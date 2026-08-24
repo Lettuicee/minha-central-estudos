@@ -1,10 +1,20 @@
 import streamlit as st
+import time
 from supabase import create_client
 
 supabase = create_client(
     st.secrets["SUPABASE_URL"],
     st.secrets["SUPABASE_KEY"]
 )
+
+if "cronometro_rodando" not in st.session_state:
+    st.session_state.cronometro_rodando = False
+
+if "cronometro_inicio" not in st.session_state:
+    st.session_state.cronometro_inicio = None
+
+if "cronometro_acumulado" not in st.session_state:
+    st.session_state.cronometro_acumulado = 0
 
 if "materias" not in st.session_state:
     st.session_state.materias = []
@@ -209,7 +219,139 @@ elif pagina == "⏱️ Estudar":
 
     st.header("⏱️ Sessão de estudo")
 
-    st.info("Nosso cronômetro vai ficar aqui. 🕯️")
+    resposta = supabase.table("materias").select("*").execute()
+    materias = resposta.data
+
+    if not materias:
+
+        st.warning("Cadastre pelo menos uma matéria primeiro. 📚")
+
+    else:
+
+        nomes_materias = [
+            materia["nome"]
+            for materia in materias
+        ]
+
+        materia_escolhida = st.selectbox(
+            "📚 O que você vai estudar?",
+            nomes_materias
+        )
+
+        if st.session_state.cronometro_rodando:
+
+            run_every = 1
+
+        else:
+
+            run_every = None
+
+
+        @st.fragment(run_every=run_every)
+        def mostrar_cronometro():
+
+            if st.session_state.cronometro_rodando:
+
+                tempo_atual = (
+                    st.session_state.cronometro_acumulado
+                    + time.time()
+                    - st.session_state.cronometro_inicio
+                )
+
+            else:
+
+                tempo_atual = (
+                    st.session_state.cronometro_acumulado
+                )
+
+
+            horas = int(tempo_atual // 3600)
+
+            minutos = int(
+                (tempo_atual % 3600) // 60
+            )
+
+            segundos = int(
+                tempo_atual % 60
+            )
+
+
+            st.markdown(
+                f"""
+                <div style="
+                    text-align: center;
+                    font-size: 70px;
+                    font-family: serif;
+                    margin: 30px;
+                ">
+                    ⏱️ {horas:02d}:{minutos:02d}:{segundos:02d}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+
+            col1, col2, col3 = st.columns(3)
+
+
+            with col1:
+
+                if st.button(
+                    "▶️ Começar",
+                    use_container_width=True
+                ):
+
+                    if not st.session_state.cronometro_rodando:
+
+                        st.session_state.cronometro_inicio = time.time()
+
+                        st.session_state.cronometro_rodando = True
+
+                        st.rerun()
+
+
+            with col2:
+
+                if st.button(
+                    "⏸️ Pausar",
+                    use_container_width=True
+                ):
+
+                    if st.session_state.cronometro_rodando:
+
+                        st.session_state.cronometro_acumulado += (
+                            time.time()
+                            - st.session_state.cronometro_inicio
+                        )
+
+                        st.session_state.cronometro_rodando = False
+
+                        st.session_state.cronometro_inicio = None
+
+                        st.rerun()
+
+
+            with col3:
+
+                if st.button(
+                    "■ Zerar",
+                    use_container_width=True
+                ):
+
+                    st.session_state.cronometro_rodando = False
+
+                    st.session_state.cronometro_inicio = None
+
+                    st.session_state.cronometro_acumulado = 0
+
+                    st.rerun()
+
+
+        mostrar_cronometro()
+
+        st.caption(
+            f"Estudando: {materia_escolhida} 📚"
+        )
 
 
 elif pagina == "📊 Estatísticas":
