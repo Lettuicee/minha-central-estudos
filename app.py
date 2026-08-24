@@ -374,7 +374,33 @@ elif pagina == "⏱️ Estudar":
                             "materia_nome": materia_escolhida,
                             "duracao_segundos": int(tempo_total)
                         }).execute()
+
+                        # 🪙 Calcular moedas
+                        moedas_ganhas = int(tempo_total // 60)
     
+                        if moedas_ganhas > 0:
+    
+                            carteira = (
+                                supabase
+                                .table("carteira")
+                                .select("*")
+                                .limit(1)
+                                .execute()
+                            )
+    
+                            saldo_atual = carteira.data[0]["moedas"]
+    
+                            novo_saldo = (
+                                saldo_atual + moedas_ganhas
+                            )
+    
+                            supabase.table("carteira").update({
+                                "moedas": novo_saldo
+                            }).eq(
+                                "id",
+                                carteira.data[0]["id"]
+                            ).execute()
+                        
                         minutos = int(tempo_total // 60)
     
                         st.success(
