@@ -6,8 +6,6 @@ supabase = create_client(
     st.secrets["SUPABASE_KEY"]
 )
 
-st.write("URL configurada:", st.secrets["SUPABASE_URL"])
-
 if "materias" not in st.session_state:
     st.session_state.materias = []
     
@@ -161,11 +159,14 @@ elif pagina == "📚 Matérias":
 
     st.subheader("📚 Disciplinas cadastradas")
 
-    resposta = supabase.table(
-        "materias"
-    ).select("*").execute()
-
+    try:
+    resposta = supabase.table("materias").select("*").execute()
     materias = resposta.data
+
+except Exception as e:
+    st.error("Erro ao consultar o Supabase:")
+    st.code(str(e))
+    materias = []
 
     if materias:
 
