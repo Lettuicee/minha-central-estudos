@@ -137,20 +137,24 @@ elif pagina == "📚 Matérias":
 
             if nome:
 
-                supabase.table("materias").insert({
-                    "nome": nome,
-                    "semestre": semestre,
-                    "professor": professor
-                }).execute()
+                try:
+                    supabase.table("materias").insert({
+                        "nome": nome,
+                        "semestre": semestre,
+                        "professor": professor
+                    }).execute()
 
-                st.success(
-                    f"'{nome}' foi salva permanentemente! 🌷"
-                )
+                    st.success(
+                        f"'{nome}' foi salva permanentemente! 🌷"
+                    )
 
-                st.rerun()
+                    st.rerun()
+
+                except Exception as e:
+                    st.error("Erro ao salvar a matéria:")
+                    st.code(str(e))
 
             else:
-
                 st.warning(
                     "Digite o nome da matéria primeiro."
                 )
@@ -159,14 +163,17 @@ elif pagina == "📚 Matérias":
 
     st.subheader("📚 Disciplinas cadastradas")
 
-  try:
-    resposta = supabase.table("materias").select("*").execute()
-    materias = resposta.data
+    try:
+        resposta = supabase.table(
+            "materias"
+        ).select("*").execute()
 
-except Exception as e:
-    st.error("Erro ao consultar o Supabase:")
-    st.code(str(e))
-    materias = []
+        materias = resposta.data
+
+    except Exception as e:
+        st.error("Erro ao consultar o Supabase:")
+        st.code(str(e))
+        materias = []
 
     if materias:
 
