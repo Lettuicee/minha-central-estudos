@@ -299,7 +299,7 @@ elif pagina == "⏱️ Estudar":
             "📚 O que você vai estudar?",
             nomes_materias
         )
-
+        
         with open("quarto.png", "rb") as arquivo_quarto:
             quarto_base64 = base64.b64encode(
                 arquivo_quarto.read()
@@ -315,26 +315,32 @@ elif pagina == "⏱️ Estudar":
             <div style="
                 position: relative;
                 width: 450px;
-                margin: auto;
+                height: auto;
+                margin-left: auto;
+                margin-right: auto;
             ">
+
                 <img
                     src="data:image/png;base64,{quarto_base64}"
                     style="
-                        width: 100%;
+                        width: 450px;
                         display: block;
+                        position: relative;
+                        z-index: 1;
                     "
                 >
 
                 <img
                     src="data:image/png;base64,{coelhinho_base64}"
                     style="
+                        width: 250px;
                         position: absolute;
-                        width: 55%;
-                        left: 50%;
-                        bottom: 5%;
-                        transform: translateX(-50%);
+                        left: 100px;
+                        bottom: 20px;
+                        z-index: 10;
                     "
                 >
+
             </div>
             """,
             unsafe_allow_html=True
