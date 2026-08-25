@@ -27,6 +27,9 @@ if "materias" not in st.session_state:
 
 if "loja_aberta" not in st.session_state:
     st.session_state.loja_aberta = False
+
+if "livros_comprados" not in st.session_state:
+    st.session_state.livros_comprados = False
     
 st.set_page_config(
     page_title="Minha Central de Estudos",
@@ -373,10 +376,70 @@ elif pagina == "⏱️ Estudar":
 
             st.markdown("### 🪙 Loja do Coelhinho")
 
-            st.caption(
-                "Em breve você poderá comprar móveis e acessórios para o quarto! 🐰"
-            )
-        
+            col_item, col_info = st.columns([1, 2])
+
+            with col_item:
+
+                st.image(
+                    "livros.png",
+                    width=120
+                )
+
+            with col_info:
+
+                st.markdown("#### 📚 Pilha de livros")
+
+                st.write("Preço: 🪙 1 moeda")
+
+                if st.session_state.livros_comprados:
+
+                    st.success("Você já possui este item! 📚")
+
+                else:
+
+                    if st.button(
+                        "🪙 Comprar por 1 moeda",
+                        key="comprar_livros"
+                    ):
+
+                        carteira = (
+                            supabase
+                            .table("carteira")
+                            .select("*")
+                            .limit(1)
+                            .execute()
+                        )
+
+                        saldo_atual = carteira.data[0]["moedas"]
+
+                        if saldo_atual >= 1:
+
+                            novo_saldo = saldo_atual - 1
+
+                            supabase.table(
+                                "carteira"
+                            ).update({
+                                "moedas": novo_saldo
+                            }).eq(
+                                "id",
+                                carteira.data[0]["id"]
+                            ).execute()
+
+                            st.session_state.livros_comprados = True
+
+                            st.success(
+                                "🎉 Você comprou a pilha de livros!"
+                            )
+
+                            st.rerun()
+
+                        else:
+
+                            st.error(
+                                "Você não tem moedas suficientes! 🥺"
+                            )
+
+
         if st.session_state.cronometro_rodando:
 
             run_every = 1
