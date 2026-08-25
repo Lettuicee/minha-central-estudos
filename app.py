@@ -310,7 +310,7 @@ elif pagina == "⏱️ Estudar":
                 width=450
             )
             
-        if st.session_state.cronometro_rodando:
+            if st.session_state.cronometro_rodando:
 
         else:
 
