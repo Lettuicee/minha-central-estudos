@@ -89,6 +89,10 @@ quarto_interativo = st.components.v2.component(
                     <img
                         id="coelho"
                         src="data:image/png;base64,${data.coelho}"
+                        style="
+                            left: ${data.coelho_x}%;
+                            bottom: ${data.coelho_y}%;
+                        "
                     >
 
                 </div>
@@ -606,7 +610,9 @@ elif pagina == "⏱️ Estudar":
                 ),
                 "livros_comprados": livros_comprados,
                 "livros_x": livros_x,
-                "livros_y": livros_y
+                "livros_y": livros_y,
+                "coelho_x": coelho_x,
+                "coelho_y": coelho_y
             },
             key="meu_quarto",
             on_livros_movidos_change=lambda: None
