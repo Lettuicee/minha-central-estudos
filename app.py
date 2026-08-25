@@ -354,12 +354,15 @@ elif pagina == "⏱️ Estudar":
 
         st.html(
             f"""
-            <div style="
-                position: relative;
-                width: 700px;
-                max-width: 100%;
-                margin: 0 auto;
-            ">
+            <div
+                id="quarto"
+                style="
+                    position: relative;
+                    width: 700px;
+                    max-width: 100%;
+                    margin: 0 auto;
+                "
+            >
 
                 <img
                     src="data:image/png;base64,{quarto_base64}"
@@ -373,6 +376,7 @@ elif pagina == "⏱️ Estudar":
                 {
                     f'''
                     <img
+                        id="livros"
                         src="data:image/png;base64,{livros_base64}"
                         style="
                             position: absolute;
@@ -380,6 +384,8 @@ elif pagina == "⏱️ Estudar":
                             left: {livros_x}%;
                             bottom: {livros_y}%;
                             z-index: 2;
+                            cursor: grab;
+                            user-select: none;
                         "
                     >
                     '''
@@ -395,12 +401,115 @@ elif pagina == "⏱️ Estudar":
                         left: 50%;
                         bottom: 4%;
                         transform: translateX(-50%);
+                        z-index: 3;
                     "
                 >
 
             </div>
+
+            <script>
+                const livros = document.getElementById("livros");
+                const quarto = document.getElementById("quarto");
+
+                if (livros) {{
+
+                    let arrastando = false;
+                    let deslocamentoX = 0;
+                    let deslocamentoY = 0;
+
+                    livros.addEventListener(
+                        "mousedown",
+                        function(evento) {{
+
+                            arrastando = true;
+
+                            const livrosRect =
+                                livros.getBoundingClientRect();
+
+                            deslocamentoX =
+                                evento.clientX - livrosRect.left;
+
+                            deslocamentoY =
+                                evento.clientY - livrosRect.top;
+
+                            livros.style.cursor = "grabbing";
+                        }}
+                    );
+
+                    document.addEventListener(
+                        "mousemove",
+                        function(evento) {{
+
+                            if (!arrastando) {{
+                                return;
+                            }}
+
+                            const quartoRect =
+                                quarto.getBoundingClientRect();
+
+                            let novaPosicaoX =
+                                evento.clientX
+                                - quartoRect.left
+                                - deslocamentoX;
+
+                            let novaPosicaoY =
+                                evento.clientY
+                                - quartoRect.top
+                                - deslocamentoY;
+
+                            const maxX =
+                                quartoRect.width
+                                - livros.offsetWidth;
+
+                            const maxY =
+                                quartoRect.height
+                                - livros.offsetHeight;
+
+                            novaPosicaoX =
+                                Math.max(
+                                    0,
+                                    Math.min(
+                                        novaPosicaoX,
+                                        maxX
+                                    )
+                                );
+
+                            novaPosicaoY =
+                                Math.max(
+                                    0,
+                                    Math.min(
+                                        novaPosicaoY,
+                                        maxY
+                                    )
+                                );
+
+                            livros.style.left =
+                                novaPosicaoX + "px";
+
+                            livros.style.top =
+                                novaPosicaoY + "px";
+
+                            livros.style.bottom = "auto";
+                        }}
+                    );
+
+                    document.addEventListener(
+                        "mouseup",
+                        function() {{
+
+                            if (arrastando) {{
+
+                                arrastando = false;
+
+                                livros.style.cursor = "grab";
+                            }}
+                        }}
+                    );
+                }}
+            </script>
             """,
-            width="stretch"
+            width="stretch",
+            unsafe_allow_javascript=True
         )
 
         if st.button(
