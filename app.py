@@ -592,6 +592,28 @@ elif pagina == "⏱️ Estudar":
             on_livros_movidos_change=lambda: None
         )
 
+        if resultado_quarto.livros_movidos:
+
+            nova_posicao = (
+                resultado_quarto.livros_movidos
+            )
+
+            novo_x = nova_posicao["x"]
+
+            novo_y = nova_posicao["y"]
+
+            supabase.table(
+                "carteira"
+            ).update({
+                "livros_x": novo_x,
+                "livros_y": novo_y
+            }).eq(
+                "id",
+                carteira.data[0]["id"]
+            ).execute()
+
+            st.rerun()
+            
         if st.button(
             "🪙 Loja do coelhinho",
             key="botao_loja",
