@@ -425,7 +425,7 @@ elif pagina == "⏱️ Estudar":
 
                  st.success("Você já possui este item! 📚")
 
-                else:
+            else:
 
                     if st.button(
                         "🪙 Comprar por 1 moeda",
