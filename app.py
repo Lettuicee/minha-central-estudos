@@ -24,6 +24,9 @@ if "ultima_recompensa" not in st.session_state:
     
 if "materias" not in st.session_state:
     st.session_state.materias = []
+
+if "loja_aberta" not in st.session_state:
+    st.session_state.loja_aberta = False
     
 st.set_page_config(
     page_title="Minha Central de Estudos",
@@ -352,6 +355,27 @@ elif pagina == "⏱️ Estudar":
             """,
             width="stretch"
         )
+
+        if st.button(
+            "🪙 Loja do coelhinho",
+            key="botao_loja",
+            use_container_width=True
+        ):
+
+            st.session_state.loja_aberta = (
+                not st.session_state.loja_aberta
+            )
+
+            st.rerun()
+
+
+        if st.session_state.loja_aberta:
+
+            st.markdown("### 🪙 Loja do Coelhinho")
+
+            st.caption(
+                "Em breve você poderá comprar móveis e acessórios para o quarto! 🐰"
+            )
         
         if st.session_state.cronometro_rodando:
 
