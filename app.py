@@ -299,17 +299,32 @@ elif pagina == "⏱️ Estudar":
             nomes_materias
         )
 
-        col_esquerda, col_bichinho, col_direita = st.columns(
-            [1, 1, 1]
+        st.markdown(
+            """
+            <div style="
+                background: rgba(55, 39, 42, 0.75);
+                border: 1px solid rgba(218, 191, 166, 0.2);
+                border-radius: 18px;
+                height: 420px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-top: 20px;
+                margin-bottom: 20px;
+            ">
+                <img
+                    src="coelhinho.png"
+                    style="
+                        width: 450px;
+                        max-width: 90%;
+                        object-fit: contain;
+                    "
+                >
+            </div>
+            """,
+            unsafe_allow_html=True
         )
 
-        with col_bichinho:
-
-            st.image(
-                "coelhinho.png",
-                width=450
-            )
-            
         if st.session_state.cronometro_rodando:
 
             run_every = 1
