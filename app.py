@@ -300,21 +300,46 @@ elif pagina == "⏱️ Estudar":
             nomes_materias
         )
 
-        col_esquerda, col_quarto, col_direita = st.columns(
-            [1, 1, 1]
+        with open("quarto.png", "rb") as arquivo:
+            quarto_base64 = base64.b64encode(
+                arquivo.read()
+            ).decode("utf-8")
+
+        with open("coelhinho.png", "rb") as arquivo:
+            coelhinho_base64 = base64.b64encode(
+                arquivo.read()
+            ).decode("utf-8")
+
+        st.html(
+            f"""
+            <div style="
+                position: relative;
+                width: 450px;
+                margin: auto;
+            ">
+
+                <img
+                    src="data:image/png;base64,{quarto_base64}"
+                    style="
+                        width: 450px;
+                        display: block;
+                    "
+                >
+
+                <img
+                    src="data:image/png;base64,{coelhinho_base64}"
+                    style="
+                        position: absolute;
+                        width: 250px;
+                        left: 100px;
+                        bottom: 20px;
+                    "
+                >
+
+            </div>
+            """,
+            width="content"
         )
-
-        with col_quarto:
-
-            st.image(
-                "quarto.png",
-                width=450
-            )
-
-            st.image(
-                "coelhinho.png",
-                width=450
-            )
         
         if st.session_state.cronometro_rodando:
 
