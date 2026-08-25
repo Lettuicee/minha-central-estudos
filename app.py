@@ -325,6 +325,13 @@ elif pagina == "⏱️ Estudar":
                 arquivo.read()
             ).decode("utf-8")
 
+        if st.session_state.livros_comprados:
+
+            with open("livros.png", "rb") as arquivo:
+                livros_base64 = base64.b64encode(
+                    arquivo.read()
+                ).decode("utf-8")
+
         st.html(
             f"""
             <div style="
@@ -342,6 +349,23 @@ elif pagina == "⏱️ Estudar":
                         display: block;
                     "
                 >
+
+                {
+                    f'''
+                    <img
+                        src="data:image/png;base64,{livros_base64}"
+                        style="
+                            position: absolute;
+                            width: 18%;
+                            left: 10%;
+                            bottom: 8%;
+                            z-index: 2;
+                        "
+                    >
+                    '''
+                    if st.session_state.livros_comprados
+                    else ""
+                }
 
                 <img
                     src="data:image/png;base64,{coelhinho_base64}"
