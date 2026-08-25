@@ -305,7 +305,13 @@ elif pagina == "⏱️ Estudar":
                 arquivo.read()
             ).decode("utf-8")
 
-        with open("coelhinho.png", "rb") as arquivo:
+        if st.session_state.cronometro_rodando:
+            imagem_coelho = "coelhoestudando.png"
+
+        else:
+            imagem_coelho = "coelhinho.png"
+
+        with open(imagem_coelho, "rb") as arquivo:
             coelhinho_base64 = base64.b64encode(
                 arquivo.read()
             ).decode("utf-8")
