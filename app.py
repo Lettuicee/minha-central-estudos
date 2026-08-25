@@ -260,7 +260,9 @@ quarto_interativo = st.components.v2.component(
                 coelho,
                 "coelho_movido"
             );
-
+        }
+    """
+)
             
 supabase = create_client(
     st.secrets["SUPABASE_URL"],
