@@ -239,7 +239,7 @@ elif pagina == "⏱️ Estudar":
     carteira = (
         supabase
         .table("carteira")
-        .select("moedas")
+        .select("id, moedas, livros_comprados")
         .limit(1)
         .execute()
     )
@@ -248,6 +248,12 @@ elif pagina == "⏱️ Estudar":
         carteira.data[0]["moedas"]
         if carteira.data
         else 0
+    )
+
+    livros_comprados = (
+        carteira.data[0]["livros_comprados"]
+        if carteira.data
+        else False
     )
 
     st.markdown(
@@ -325,7 +331,7 @@ elif pagina == "⏱️ Estudar":
                 arquivo.read()
             ).decode("utf-8")
 
-        if st.session_state.livros_comprados:
+        if livros_comprados:
 
             with open("livros.png", "rb") as arquivo:
                 livros_base64 = base64.b64encode(
@@ -415,9 +421,9 @@ elif pagina == "⏱️ Estudar":
 
                 st.write("Preço: 🪙 1 moeda")
 
-                if st.session_state.livros_comprados:
+            if livros_comprados:
 
-                    st.success("Você já possui este item! 📚")
+                 st.success("Você já possui este item! 📚")
 
                 else:
 
@@ -443,13 +449,12 @@ elif pagina == "⏱️ Estudar":
                             supabase.table(
                                 "carteira"
                             ).update({
-                                "moedas": novo_saldo
+                                "moedas": novo_saldo,
+                                "livros_comprados": True
                             }).eq(
                                 "id",
                                 carteira.data[0]["id"]
                             ).execute()
-
-                            st.session_state.livros_comprados = True
 
                             st.success(
                                 "🎉 Você comprou a pilha de livros!"
