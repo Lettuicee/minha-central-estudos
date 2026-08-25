@@ -5,6 +5,229 @@ from supabase import create_client
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+quarto_interativo = st.components.v2.component(
+    "quarto_interativo",
+    html="""
+        <div id="cenario"></div>
+    """,
+    css="""
+        #cenario {
+            width: 700px;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        #quarto {
+            position: relative;
+            width: 700px;
+            max-width: 100%;
+        }
+
+        #fundo {
+            width: 700px;
+            max-width: 100%;
+            display: block;
+        }
+
+        #livros {
+            position: absolute;
+            width: 18%;
+            cursor: grab;
+            user-select: none;
+            z-index: 2;
+        }
+
+        #coelho {
+            position: absolute;
+            width: 39%;
+            left: 50%;
+            bottom: 4%;
+            transform: translateX(-50%);
+            z-index: 3;
+        }
+    """,
+    js="""
+        export default function(component) {
+
+            const {
+                data,
+                parentElement,
+                setTriggerValue
+            } = component;
+
+            const cenario = parentElement.querySelector(
+                "#cenario"
+            );
+
+            if (!data) {
+                return;
+            }
+
+            cenario.innerHTML = `
+                <div id="quarto">
+
+                    <img
+                        id="fundo"
+                        src="data:image/png;base64,${data.quarto}"
+                    >
+
+                    ${
+                        data.livros_comprados
+                        ? `
+                            <img
+                                id="livros"
+                                src="data:image/png;base64,${data.livros}"
+                                style="
+                                    left: ${data.livros_x}%;
+                                    bottom: ${data.livros_y}%;
+                                "
+                            >
+                        `
+                        : ""
+                    }
+
+                    <img
+                        id="coelho"
+                        src="data:image/png;base64,${data.coelho}"
+                    >
+
+                </div>
+            `;
+
+            const livros = cenario.querySelector("#livros");
+            const quarto = cenario.querySelector("#quarto");
+
+            if (!livros) {
+                return;
+            }
+
+            let arrastando = false;
+            let deslocamentoX = 0;
+            let deslocamentoY = 0;
+
+            livros.addEventListener(
+                "mousedown",
+                function(evento) {
+
+                    arrastando = true;
+
+                    const livrosRect =
+                        livros.getBoundingClientRect();
+
+                    deslocamentoX =
+                        evento.clientX - livrosRect.left;
+
+                    deslocamentoY =
+                        evento.clientY - livrosRect.top;
+
+                    livros.style.cursor = "grabbing";
+                }
+            );
+
+            document.addEventListener(
+                "mousemove",
+                function(evento) {
+
+                    if (!arrastando) {
+                        return;
+                    }
+
+                    const quartoRect =
+                        quarto.getBoundingClientRect();
+
+                    let novaPosicaoX =
+                        evento.clientX
+                        - quartoRect.left
+                        - deslocamentoX;
+
+                    let novaPosicaoY =
+                        evento.clientY
+                        - quartoRect.top
+                        - deslocamentoY;
+
+                    const maxX =
+                        quartoRect.width
+                        - livros.offsetWidth;
+
+                    const maxY =
+                        quartoRect.height
+                        - livros.offsetHeight;
+
+                    novaPosicaoX =
+                        Math.max(
+                            0,
+                            Math.min(
+                                novaPosicaoX,
+                                maxX
+                            )
+                        );
+
+                    novaPosicaoY =
+                        Math.max(
+                            0,
+                            Math.min(
+                                novaPosicaoY,
+                                maxY
+                            )
+                        );
+
+                    livros.style.left =
+                        novaPosicaoX + "px";
+
+                    livros.style.top =
+                        novaPosicaoY + "px";
+
+                    livros.style.bottom = "auto";
+                }
+            );
+
+            document.addEventListener(
+                "mouseup",
+                function() {
+
+                    if (!arrastando) {
+                        return;
+                    }
+
+                    arrastando = false;
+
+                    livros.style.cursor = "grab";
+
+                    const quartoRect =
+                        quarto.getBoundingClientRect();
+
+                    const livrosRect =
+                        livros.getBoundingClientRect();
+
+                    const posicaoX =
+                        (
+                            livrosRect.left
+                            - quartoRect.left
+                        )
+                        / quartoRect.width
+                        * 100;
+
+                    const posicaoY =
+                        (
+                            quartoRect.bottom
+                            - livrosRect.bottom
+                        )
+                        / quartoRect.height
+                        * 100;
+
+                    setTriggerValue(
+                        "livros_movidos",
+                        {
+                            x: Math.round(posicaoX),
+                            y: Math.round(posicaoY)
+                        }
+                    );
+                }
+            );
+        }
+    """
+)
+
 supabase = create_client(
     st.secrets["SUPABASE_URL"],
     st.secrets["SUPABASE_KEY"]
