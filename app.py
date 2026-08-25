@@ -463,7 +463,15 @@ elif pagina == "⏱️ Estudar":
         supabase
         .table("carteira")
         .select(
-            "id, moedas, livros_comprados, livros_x, livros_y"
+            """
+            id,
+            moedas,
+            livros_comprados,
+            livros_x,
+            livros_y,
+            coelho_x,
+            coelho_y
+            """
         )
         .limit(1)
         .execute()
@@ -491,6 +499,18 @@ elif pagina == "⏱️ Estudar":
         carteira.data[0]["livros_y"]
         if carteira.data
         else 8
+    )
+
+    coelho_x = (
+        carteira.data[0]["coelho_x"]
+        if carteira.data
+        else 50
+    )
+
+    coelho_y = (
+        carteira.data[0]["coelho_y"]
+        if carteira.data
+        else 4
     )
 
     st.markdown(
