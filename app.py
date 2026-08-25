@@ -314,14 +314,16 @@ elif pagina == "⏱️ Estudar":
             f"""
             <div style="
                 position: relative;
-                width: 450px;
-                margin: auto;
+                width: 700px;
+                max-width: 100%;
+                margin: 0 auto;
             ">
 
                 <img
                     src="data:image/png;base64,{quarto_base64}"
                     style="
-                        width: 450px;
+                        width: 700px;
+                        max-width: 100%;
                         display: block;
                     "
                 >
@@ -330,15 +332,16 @@ elif pagina == "⏱️ Estudar":
                     src="data:image/png;base64,{coelhinho_base64}"
                     style="
                         position: absolute;
-                        width: 250px;
-                        left: 100px;
-                        bottom: 20px;
+                        width: 39%;
+                        left: 50%;
+                        bottom: 4%;
+                        transform: translateX(-50%);
                     "
                 >
 
             </div>
             """,
-            width="content"
+            width="stretch"
         )
         
         if st.session_state.cronometro_rodando:
