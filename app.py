@@ -302,17 +302,17 @@ elif pagina == "⏱️ Estudar":
         col_esquerda, col_bichinho, col_direita = st.columns(
             [1, 1, 1]
         )
-
+        
         with col_bichinho:
-
-            st.image(
-                "coelhinho.png",
-                width=450
-            )
+        
+             st.image(
+                 "coelhinho.png",
+                  width=450
+             )
+        
+        if st.session_state.cronometro_rodando:
             
-            if st.session_state.cronometro_rodando:
-
-        else:
+            else:
 
             run_every = None
 
