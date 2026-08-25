@@ -575,164 +575,21 @@ elif pagina == "⏱️ Estudar":
                     arquivo.read()
                 ).decode("utf-8")
 
-        st.html(
-            f"""
-            <div
-                id="quarto"
-                style="
-                    position: relative;
-                    width: 700px;
-                    max-width: 100%;
-                    margin: 0 auto;
-                "
-            >
-
-                <img
-                    src="data:image/png;base64,{quarto_base64}"
-                    style="
-                        width: 700px;
-                        max-width: 100%;
-                        display: block;
-                    "
-                >
-
-                {
-                    f'''
-                    <img
-                        id="livros"
-                        src="data:image/png;base64,{livros_base64}"
-                        style="
-                            position: absolute;
-                            width: 18%;
-                            left: {livros_x}%;
-                            bottom: {livros_y}%;
-                            z-index: 2;
-                            cursor: grab;
-                            user-select: none;
-                        "
-                    >
-                    '''
+        resultado_quarto = quarto_interativo(
+            data={
+                "quarto": quarto_base64,
+                "coelho": coelhinho_base64,
+                "livros": (
+                    livros_base64
                     if livros_comprados
                     else ""
-                }
-
-                <img
-                    src="data:image/png;base64,{coelhinho_base64}"
-                    style="
-                        position: absolute;
-                        width: 39%;
-                        left: 50%;
-                        bottom: 4%;
-                        transform: translateX(-50%);
-                        z-index: 3;
-                    "
-                >
-
-            </div>
-
-            <script>
-                const livros = document.getElementById("livros");
-                const quarto = document.getElementById("quarto");
-
-                if (livros) {{
-
-                    let arrastando = false;
-                    let deslocamentoX = 0;
-                    let deslocamentoY = 0;
-
-                    livros.addEventListener(
-                        "mousedown",
-                        function(evento) {{
-
-                            arrastando = true;
-
-                            const livrosRect =
-                                livros.getBoundingClientRect();
-
-                            deslocamentoX =
-                                evento.clientX - livrosRect.left;
-
-                            deslocamentoY =
-                                evento.clientY - livrosRect.top;
-
-                            livros.style.cursor = "grabbing";
-                        }}
-                    );
-
-                    document.addEventListener(
-                        "mousemove",
-                        function(evento) {{
-
-                            if (!arrastando) {{
-                                return;
-                            }}
-
-                            const quartoRect =
-                                quarto.getBoundingClientRect();
-
-                            let novaPosicaoX =
-                                evento.clientX
-                                - quartoRect.left
-                                - deslocamentoX;
-
-                            let novaPosicaoY =
-                                evento.clientY
-                                - quartoRect.top
-                                - deslocamentoY;
-
-                            const maxX =
-                                quartoRect.width
-                                - livros.offsetWidth;
-
-                            const maxY =
-                                quartoRect.height
-                                - livros.offsetHeight;
-
-                            novaPosicaoX =
-                                Math.max(
-                                    0,
-                                    Math.min(
-                                        novaPosicaoX,
-                                        maxX
-                                    )
-                                );
-
-                            novaPosicaoY =
-                                Math.max(
-                                    0,
-                                    Math.min(
-                                        novaPosicaoY,
-                                        maxY
-                                    )
-                                );
-
-                            livros.style.left =
-                                novaPosicaoX + "px";
-
-                            livros.style.top =
-                                novaPosicaoY + "px";
-
-                            livros.style.bottom = "auto";
-                        }}
-                    );
-
-                    document.addEventListener(
-                        "mouseup",
-                        function() {{
-
-                            if (arrastando) {{
-
-                                arrastando = false;
-
-                                livros.style.cursor = "grab";
-                            }}
-                        }}
-                    );
-                }}
-            </script>
-            """,
-            width="stretch",
-            unsafe_allow_javascript=True
+                ),
+                "livros_comprados": livros_comprados,
+                "livros_x": livros_x,
+                "livros_y": livros_y
+            },
+            key="meu_quarto",
+            on_livros_movidos_change=lambda: None
         )
 
         if st.button(
