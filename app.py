@@ -100,138 +100,167 @@ quarto_interativo = st.components.v2.component(
 
             const livros = cenario.querySelector("#livros");
             const quarto = cenario.querySelector("#quarto");
+            const coelho = cenario.querySelector("#coelho");
 
-            if (!livros) {
-                return;
+
+            function tornarArrastavel(
+                elemento,
+                nomeEvento
+            ) {
+
+                if (!elemento) {
+                    return;
+                }
+
+                let arrastando = false;
+                let deslocamentoX = 0;
+                let deslocamentoY = 0;
+
+
+                elemento.addEventListener(
+                    "mousedown",
+                    function(evento) {
+
+                        arrastando = true;
+
+                        const elementoRect =
+                            elemento.getBoundingClientRect();
+
+                        deslocamentoX =
+                            evento.clientX
+                            - elementoRect.left;
+
+                        deslocamentoY =
+                            evento.clientY
+                            - elementoRect.top;
+
+                        elemento.style.cursor =
+                            "grabbing";
+
+                        evento.preventDefault();
+                    }
+                );
+
+
+                document.addEventListener(
+                    "mousemove",
+                    function(evento) {
+
+                        if (!arrastando) {
+                            return;
+                        }
+
+                        const quartoRect =
+                            quarto.getBoundingClientRect();
+
+                        let novaPosicaoX =
+                            evento.clientX
+                            - quartoRect.left
+                            - deslocamentoX;
+
+                        let novaPosicaoY =
+                            evento.clientY
+                            - quartoRect.top
+                            - deslocamentoY;
+
+                        const maxX =
+                            quartoRect.width
+                            - elemento.offsetWidth;
+
+                        const maxY =
+                            quartoRect.height
+                            - elemento.offsetHeight;
+
+                        novaPosicaoX =
+                            Math.max(
+                                0,
+                                Math.min(
+                                    novaPosicaoX,
+                                    maxX
+                                )
+                            );
+
+                        novaPosicaoY =
+                            Math.max(
+                                0,
+                                Math.min(
+                                    novaPosicaoY,
+                                    maxY
+                                )
+                            );
+
+                        elemento.style.left =
+                            novaPosicaoX + "px";
+
+                        elemento.style.top =
+                            novaPosicaoY + "px";
+
+                        elemento.style.bottom =
+                            "auto";
+
+                        elemento.style.transform =
+                            "none";
+                    }
+                );
+
+
+                document.addEventListener(
+                    "mouseup",
+                    function() {
+
+                        if (!arrastando) {
+                            return;
+                        }
+
+                        arrastando = false;
+
+                        elemento.style.cursor =
+                            "grab";
+
+                        const quartoRect =
+                            quarto.getBoundingClientRect();
+
+                        const elementoRect =
+                            elemento.getBoundingClientRect();
+
+                        const posicaoX =
+                            (
+                                elementoRect.left
+                                - quartoRect.left
+                            )
+                            / quartoRect.width
+                            * 100;
+
+                        const posicaoY =
+                            (
+                                quartoRect.bottom
+                                - elementoRect.bottom
+                            )
+                            / quartoRect.height
+                            * 100;
+
+                        setTriggerValue(
+                            nomeEvento,
+                            {
+                                x: Math.round(posicaoX),
+                                y: Math.round(posicaoY)
+                            }
+                        );
+                    }
+                );
             }
 
-            let arrastando = false;
-            let deslocamentoX = 0;
-            let deslocamentoY = 0;
 
-            livros.addEventListener(
-                "mousedown",
-                function(evento) {
-
-                    arrastando = true;
-
-                    const livrosRect =
-                        livros.getBoundingClientRect();
-
-                    deslocamentoX =
-                        evento.clientX - livrosRect.left;
-
-                    deslocamentoY =
-                        evento.clientY - livrosRect.top;
-
-                    livros.style.cursor = "grabbing";
-                }
+            tornarArrastavel(
+                livros,
+                "livros_movidos"
             );
 
-            document.addEventListener(
-                "mousemove",
-                function(evento) {
-
-                    if (!arrastando) {
-                        return;
-                    }
-
-                    const quartoRect =
-                        quarto.getBoundingClientRect();
-
-                    let novaPosicaoX =
-                        evento.clientX
-                        - quartoRect.left
-                        - deslocamentoX;
-
-                    let novaPosicaoY =
-                        evento.clientY
-                        - quartoRect.top
-                        - deslocamentoY;
-
-                    const maxX =
-                        quartoRect.width
-                        - livros.offsetWidth;
-
-                    const maxY =
-                        quartoRect.height
-                        - livros.offsetHeight;
-
-                    novaPosicaoX =
-                        Math.max(
-                            0,
-                            Math.min(
-                                novaPosicaoX,
-                                maxX
-                            )
-                        );
-
-                    novaPosicaoY =
-                        Math.max(
-                            0,
-                            Math.min(
-                                novaPosicaoY,
-                                maxY
-                            )
-                        );
-
-                    livros.style.left =
-                        novaPosicaoX + "px";
-
-                    livros.style.top =
-                        novaPosicaoY + "px";
-
-                    livros.style.bottom = "auto";
-                }
+            tornarArrastavel(
+                coelho,
+                "coelho_movido"
             );
-
-            document.addEventListener(
-                "mouseup",
-                function() {
-
-                    if (!arrastando) {
-                        return;
-                    }
-
-                    arrastando = false;
-
-                    livros.style.cursor = "grab";
-
-                    const quartoRect =
-                        quarto.getBoundingClientRect();
-
-                    const livrosRect =
-                        livros.getBoundingClientRect();
-
-                    const posicaoX =
-                        (
-                            livrosRect.left
-                            - quartoRect.left
-                        )
-                        / quartoRect.width
-                        * 100;
-
-                    const posicaoY =
-                        (
-                            quartoRect.bottom
-                            - livrosRect.bottom
-                        )
-                        / quartoRect.height
-                        * 100;
-
-                    setTriggerValue(
-                        "livros_movidos",
-                        {
-                            x: Math.round(posicaoX),
-                            y: Math.round(posicaoY)
-                        }
-                    );
-                }
-            );
-        }
-    """
-)
-
+            
 supabase = create_client(
     st.secrets["SUPABASE_URL"],
     st.secrets["SUPABASE_KEY"]
