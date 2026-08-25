@@ -305,14 +305,16 @@ elif pagina == "⏱️ Estudar":
         
         with col_bichinho:
         
-             st.image(
-                 "coelhinho.png",
-                  width=450
-             )
+            st.image(
+                "coelhinho.png",
+                width=450
+            )
         
         if st.session_state.cronometro_rodando:
+
+            run_every = 1
             
-            else:
+        else:
 
             run_every = None
 
