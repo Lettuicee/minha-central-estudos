@@ -1,5 +1,6 @@
 import streamlit as st
 import time
+import base64
 from supabase import create_client
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -299,21 +300,45 @@ elif pagina == "⏱️ Estudar":
             nomes_materias
         )
 
-        col_esquerda, col_quarto, col_direita = st.columns(
-            [1, 1, 1]
+        with open("quarto.png", "rb") as arquivo_quarto:
+            quarto_base64 = base64.b64encode(
+                arquivo_quarto.read()
+            ).decode()
+
+        with open("coelhinho.png", "rb") as arquivo_coelhinho:
+            coelhinho_base64 = base64.b64encode(
+                arquivo_coelhinho.read()
+            ).decode()
+
+        st.markdown(
+            f"""
+            <div style="
+                position: relative;
+                width: 450px;
+                margin: auto;
+            ">
+                <img
+                    src="data:image/png;base64,{quarto_base64}"
+                    style="
+                        width: 100%;
+                        display: block;
+                    "
+                >
+
+                <img
+                    src="data:image/png;base64,{coelhinho_base64}"
+                    style="
+                        position: absolute;
+                        width: 55%;
+                        left: 50%;
+                        bottom: 5%;
+                        transform: translateX(-50%);
+                    "
+                >
+            </div>
+            """,
+            unsafe_allow_html=True
         )
-
-        with col_quarto:
-
-            st.image(
-                "quarto.png",
-                width=450
-            )
-
-            st.image(
-                "coelhinho.png",
-                width=450
-            )
         
         if st.session_state.cronometro_rodando:
 
