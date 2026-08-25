@@ -299,12 +299,17 @@ elif pagina == "⏱️ Estudar":
             nomes_materias
         )
 
-        col_esquerda, col_bichinho, col_direita = st.columns(
+        col_esquerda, col_quarto, col_direita = st.columns(
             [1, 1, 1]
         )
-        
-        with col_bichinho:
-        
+
+        with col_quarto:
+
+            st.image(
+                "quarto.png",
+                width=450
+            )
+
             st.image(
                 "coelhinho.png",
                 width=450
