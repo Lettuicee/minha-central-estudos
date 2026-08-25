@@ -369,7 +369,7 @@ elif pagina == "⏱️ Estudar":
                         "
                     >
                     '''
-                    if st.session_state.livros_comprados
+                    if livros_comprados
                     else ""
                 }
 
