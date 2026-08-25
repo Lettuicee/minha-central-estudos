@@ -305,7 +305,10 @@ elif pagina == "⏱️ Estudar":
                 arquivo.read()
             ).decode("utf-8")
 
-        if st.session_state.cronometro_rodando:
+        if st.session_state.ultima_recompensa:
+            imagem_coelho = "coelhofeliz.png"
+
+        elif st.session_state.cronometro_rodando:
             imagem_coelho = "coelhoestudando.png"
 
         else:
