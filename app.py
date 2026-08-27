@@ -475,7 +475,10 @@ elif pagina == "📚 Matérias":
 
             st.subheader("📖 Conteúdos da matéria")
 
-            with st.form("form_novo_topico"):
+            with st.form(
+                "form_novo_topico",
+                clear_on_submit=True
+            ):
 
                 titulo_topico = st.text_input(
                     "Nome da aula ou tópico"
