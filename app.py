@@ -431,7 +431,10 @@ elif pagina == "📚 Matérias":
 
     st.header("📚 Minhas matérias")
 
-    with st.form("form_materia"):
+    with st.form(
+        "form_materia",
+        clear_on_submit=True
+    ):
 
         nome = st.text_input("Nome da matéria")
 
