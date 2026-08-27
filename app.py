@@ -555,15 +555,58 @@ elif pagina == "📚 Matérias":
             if topicos:
 
                 for topico in topicos:
-
+            
                     with st.expander(
                         f"📖 {topico['titulo']}"
                     ):
-
-                        st.write(
-                            "Ainda vamos construir "
-                            "o conteúdo deste tópico. 📚"
+            
+                        conteudo_atual = (
+                            topico["conteudo"] or ""
                         )
+            
+                        with st.form(
+                            f"form_conteudo_{topico['id']}"
+                        ):
+            
+                            novo_conteudo = st.text_area(
+                                "📝 Anotações",
+                                value=conteudo_atual,
+                                height=250,
+                                key=f"conteudo_{topico['id']}"
+                            )
+            
+                            salvar_conteudo = (
+                                st.form_submit_button(
+                                    "💾 Salvar anotações"
+                                )
+                            )
+            
+                            if salvar_conteudo:
+            
+                                try:
+            
+                                    supabase.table(
+                                        "topicos"
+                                    ).update({
+                                        "conteudo": novo_conteudo
+                                    }).eq(
+                                        "id",
+                                        topico["id"]
+                                    ).execute()
+            
+                                    st.success(
+                                        "Anotações salvas! 📚"
+                                    )
+            
+                                    st.rerun()
+            
+                                except Exception as e:
+            
+                                    st.error(
+                                        "Erro ao salvar as anotações:"
+                                    )
+            
+                                    st.code(str(e))
 
             else:
 
