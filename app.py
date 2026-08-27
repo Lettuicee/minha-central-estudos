@@ -580,7 +580,20 @@ elif pagina == "📚 Matérias":
                     )
         
         
-                    col1, col2 = st.columns(2)
+            if st.button(
+                "📖 Abrir matéria",
+                key=f"abrir_{materia['id']}",
+                use_container_width=True
+            ):
+
+                st.session_state.materia_aberta = (
+                    materia["id"]
+                )
+
+                st.rerun()
+
+
+            col1, col2 = st.columns(2)
         
         
                     with col1:
