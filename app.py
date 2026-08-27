@@ -502,26 +502,144 @@ elif pagina == "📚 Matérias":
 
     if materias:
 
-        for materia in materias:
+    for materia in materias:
 
-            st.markdown(
-                f"""
-                <div class="card">
+        with st.container(
+            border=True
+        ):
 
-                <h3>📚 {materia["nome"]}</h3>
-
-                <p>
-                🎓 {materia["semestre"]}
-                </p>
-
-                <p>
-                👩‍🏫 {materia["professor"] or "Professor não informado"}
-                </p>
-
-                </div>
-                """,
-                unsafe_allow_html=True
+            st.subheader(
+                f"📚 {materia['nome']}"
             )
+
+            st.write(
+                f"🎓 {materia['semestre']}"
+            )
+
+            st.write(
+                f"👩‍🏫 "
+                f"{materia['professor'] or 'Professor não informado'}"
+            )
+
+
+            col1, col2 = st.columns(2)
+
+
+            with col1:
+
+                if st.button(
+                    "✏️ Editar",
+                    key=f"editar_{materia['id']}",
+                    use_container_width=True
+                ):
+
+                    st.session_state[
+                        "materia_editando"
+                    ] = materia["id"]
+
+                    st.rerun()
+
+
+            with col2:
+
+                if st.button(
+                    "🗑️ Excluir",
+                    key=f"excluir_{materia['id']}",
+                    use_container_width=True
+                ):
+
+                    supabase.table(
+                        "materias"
+                    ).delete().eq(
+                        "id",
+                        materia["id"]
+                    ).execute()
+
+                    st.rerun()
+
+
+        if (
+            st.session_state.get(
+                "materia_editando"
+            )
+            == materia["id"]
+        ):
+
+            st.divider()
+
+            st.subheader(
+                f"✏️ Editando: {materia['nome']}"
+            )
+
+            with st.form(
+                f"form_editar_{materia['id']}"
+            ):
+
+                novo_nome = st.text_input(
+                    "Nome da matéria",
+                    value=materia["nome"]
+                )
+
+                novo_semestre = st.selectbox(
+                    "Semestre",
+                    [
+                        "1º semestre",
+                        "2º semestre",
+                        "3º semestre",
+                        "4º semestre",
+                        "5º semestre",
+                        "6º semestre",
+                        "7º semestre",
+                        "8º semestre"
+                    ],
+                    index=[
+                        "1º semestre",
+                        "2º semestre",
+                        "3º semestre",
+                        "4º semestre",
+                        "5º semestre",
+                        "6º semestre",
+                        "7º semestre",
+                        "8º semestre"
+                    ].index(
+                        materia["semestre"]
+                    )
+                )
+
+                novo_professor = st.text_input(
+                    "Professor(a)",
+                    value=materia["professor"] or ""
+                )
+
+
+                salvar = st.form_submit_button(
+                    "💾 Salvar alterações"
+                )
+
+
+                if salvar:
+
+                    supabase.table(
+                        "materias"
+                    ).update({
+
+                        "nome": novo_nome,
+
+                        "semestre": novo_semestre,
+
+                        "professor": novo_professor
+
+                    }).eq(
+                        "id",
+                        materia["id"]
+                    ).execute()
+
+
+                    st.session_state[
+                        "materia_editando"
+                    ] = None
+
+                    st.rerun()
 
     else:
 
