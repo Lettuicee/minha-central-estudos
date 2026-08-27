@@ -40,9 +40,8 @@ quarto_interativo = st.components.v2.component(
         #coelho {
             position: absolute;
             width: 39%;
-            left: 50%;
-            bottom: 4%;
-            transform: translateX(-50%);
+            cursor: grab;
+            user-select: none;
             z-index: 3;
         }
     """,
@@ -92,7 +91,6 @@ quarto_interativo = st.components.v2.component(
                         style="
                             left: ${data.coelho_x}%;
                             top: ${data.coelho_y}%;
-                            transforme: none;
                         "
                     >
 
