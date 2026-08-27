@@ -686,29 +686,47 @@ elif pagina == "⏱️ Estudar":
                 "coelho_y": coelho_y
             },
             key="meu_quarto",
-            on_livros_movidos_change=lambda: None,
-            on_coelho_movido_change=lambda: None
+            on_objeto_movido_change=lambda: None
         )
 
-        if resultado_quarto.livros_movidos:
+        if resultado_quarto.objeto_movido:
 
-            nova_posicao = (
-                resultado_quarto.livros_movidos
-            )
+            movimento = resultado_quarto.objeto_movido
 
-            novo_x = nova_posicao["x"]
+            novo_x = movimento["x"]
 
-            novo_y = nova_posicao["y"]
+            novo_y = movimento["y"]
 
-        if resultado_quarto.coelho_movido:
+            objeto = movimento["objeto"]
 
-            nova_posicao = (
-                resultado_quarto.coelho_movido
-            )
 
-            novo_x = nova_posicao["x"]
+            if objeto == "livros":
 
-            novo_y = nova_posicao["y"]
+                supabase.table(
+                    "carteira"
+                ).update({
+                    "livros_x": novo_x,
+                    "livros_y": novo_y
+                }).eq(
+                    "id",
+                    carteira.data[0]["id"]
+                ).execute()
+
+
+            elif objeto == "coelho":
+
+                supabase.table(
+                    "carteira"
+                ).update({
+                    "coelho_x": novo_x,
+                    "coelho_y": novo_y
+                }).eq(
+                    "id",
+                    carteira.data[0]["id"]
+                ).execute()
+
+
+            st.rerun()
 
             supabase.table(
                 "carteira"
