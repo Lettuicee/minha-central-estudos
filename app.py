@@ -79,7 +79,7 @@ quarto_interativo = st.components.v2.component(
                                 src="data:image/png;base64,${data.livros}"
                                 style="
                                     left: ${data.livros_x}%;
-                                    bottom: ${data.livros_y}%;
+                                    top: ${data.livros_y}%;
                                 "
                             >
                         `
@@ -91,7 +91,8 @@ quarto_interativo = st.components.v2.component(
                         src="data:image/png;base64,${data.coelho}"
                         style="
                             left: ${data.coelho_x}%;
-                            bottom: ${data.coelho_y}%;
+                            top: ${data.coelho_y}%;
+                            transforme: none;
                         "
                     >
 
@@ -233,12 +234,12 @@ quarto_interativo = st.components.v2.component(
 
                         const posicaoY =
                             (
-                                quartoRect.bottom
-                                - elementoRect.bottom
+                                elementoRect.top
+                                - quartoRect.top
                             )
                             / quartoRect.height
                             * 100;
-
+    
                         setTriggerValue(
                             nomeEvento,
                             {
