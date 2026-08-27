@@ -325,6 +325,9 @@ if "loja_aberta" not in st.session_state:
 
 if "livros_comprados" not in st.session_state:
     st.session_state.livros_comprados = False
+
+if "materia_aberta" not in st.session_state:
+    st.session_state.materia_aberta = None
     
 st.set_page_config(
     page_title="Minha Central de Estudos",
@@ -431,221 +434,276 @@ elif pagina == "📚 Matérias":
 
     st.header("📚 Minhas matérias")
 
-    with st.form(
-        "form_materia",
-        clear_on_submit=True
-    ):
+    if st.session_state.materia_aberta is not None:
 
-        nome = st.text_input("Nome da matéria")
-
-        semestre = st.selectbox(
-            "Semestre",
-            [
-                "1º semestre",
-                "2º semestre",
-                "3º semestre",
-                "4º semestre",
-                "5º semestre",
-                "6º semestre",
-                "7º semestre",
-                "8º semestre"
-            ]
+        materia_aberta_id = (
+            st.session_state.materia_aberta
         )
 
-        professor = st.text_input("Professor(a)")
-
-        enviar = st.form_submit_button(
-            "🌹 Cadastrar matéria"
+        resposta_materia = (
+            supabase
+            .table("materias")
+            .select("*")
+            .eq("id", materia_aberta_id)
+            .execute()
         )
 
-        if enviar:
+        if resposta_materia.data:
 
-            if nome:
+            materia = resposta_materia.data[0]
 
-                try:
-                    supabase.table("materias").insert({
-                        "nome": nome,
-                        "semestre": semestre,
-                        "professor": professor
-                    }).execute()
+            if st.button("← Voltar para matérias"):
 
-                    st.success(
-                        f"'{nome}' foi salva permanentemente! 🌷"
-                    )
+                st.session_state.materia_aberta = None
 
-                    st.rerun()
+                st.rerun()
 
-                except Exception as e:
-                    st.error("Erro ao salvar a matéria:")
-                    st.code(str(e))
+            st.title(
+                f"📚 {materia['nome']}"
+            )
 
-            else:
-                st.warning(
-                    "Digite o nome da matéria primeiro."
-                )
+            st.write(
+                f"🎓 {materia['semestre']}"
+            )
 
-    st.divider()
+            st.write(
+                f"👩‍🏫 "
+                f"{materia['professor'] or 'Professor não informado'}"
+            )
 
-    st.subheader("📚 Disciplinas cadastradas")
+            st.divider()
 
-    try:
-        resposta = supabase.table(
-            "materias"
-        ).select("*").execute()
+            st.info(
+                "Em breve vamos colocar aqui os tópicos, "
+                "anotações, links e histórico de estudos. 📚"
+            )
 
-        materias = resposta.data
+        else:
 
-    except Exception as e:
-        st.error("Erro ao consultar o Supabase:")
-        st.code(str(e))
-        materias = []
+            st.warning(
+                "Essa matéria não foi encontrada."
+            )
 
-    if materias:
+            st.session_state.materia_aberta = None
 
-        for materia in materias:
-    
-            with st.container(
-                border=True
-            ):
-    
-                st.subheader(
-                    f"📚 {materia['nome']}"
-                )
-    
-                st.write(
-                    f"🎓 {materia['semestre']}"
-                )
-    
-                st.write(
-                    f"👩‍🏫 "
-                    f"{materia['professor'] or 'Professor não informado'}"
-                )
-    
-    
-                col1, col2 = st.columns(2)
-    
-    
-                with col1:
-    
-                    if st.button(
-                        "✏️ Editar",
-                        key=f"editar_{materia['id']}",
-                        use_container_width=True
-                    ):
-    
-                        st.session_state[
-                            "materia_editando"
-                        ] = materia["id"]
-    
-                        st.rerun()
-    
-    
-                with col2:
-    
-                    if st.button(
-                        "🗑️ Excluir",
-                        key=f"excluir_{materia['id']}",
-                        use_container_width=True
-                    ):
-    
-                        supabase.table(
-                            "materias"
-                        ).delete().eq(
-                            "id",
-                            materia["id"]
-                        ).execute()
-    
-                        st.rerun()
-    
-    
-            if (
-                st.session_state.get(
-                    "materia_editando"
-                )
-                == materia["id"]
-            ):
-    
-                st.divider()
-    
-                st.subheader(
-                    f"✏️ Editando: {materia['nome']}"
-                )
-    
-                with st.form(
-                    f"form_editar_{materia['id']}"
-                ):
-    
-                    novo_nome = st.text_input(
-                        "Nome da matéria",
-                        value=materia["nome"]
-                    )
-    
-                    novo_semestre = st.selectbox(
-                        "Semestre",
-                        [
-                            "1º semestre",
-                            "2º semestre",
-                            "3º semestre",
-                            "4º semestre",
-                            "5º semestre",
-                            "6º semestre",
-                            "7º semestre",
-                            "8º semestre"
-                        ],
-                        index=[
-                            "1º semestre",
-                            "2º semestre",
-                            "3º semestre",
-                            "4º semestre",
-                            "5º semestre",
-                            "6º semestre",
-                            "7º semestre",
-                            "8º semestre"
-                        ].index(
-                            materia["semestre"]
-                        )
-                    )
-    
-                    novo_professor = st.text_input(
-                        "Professor(a)",
-                        value=materia["professor"] or ""
-                    )
-    
-    
-                    salvar = st.form_submit_button(
-                        "💾 Salvar alterações"
-                    )
-    
-    
-                    if salvar:
-    
-                        supabase.table(
-                            "materias"
-                        ).update({
-    
-                            "nome": novo_nome,
-    
-                            "semestre": novo_semestre,
-    
-                            "professor": novo_professor
-    
-                        }).eq(
-                            "id",
-                            materia["id"]
-                        ).execute()
-    
-    
-                        st.session_state[
-                            "materia_editando"
-                        ] = None
-    
-                        st.rerun()
 
     else:
 
-        st.info(
-            "Você ainda não cadastrou nenhuma matéria."
-        )
+        with st.form(
+            "form_materia",
+            clear_on_submit=True
+        ):
+    
+            nome = st.text_input("Nome da matéria")
+    
+            semestre = st.selectbox(
+                "Semestre",
+                [
+                    "1º semestre",
+                    "2º semestre",
+                    "3º semestre",
+                    "4º semestre",
+                    "5º semestre",
+                    "6º semestre",
+                    "7º semestre",
+                    "8º semestre"
+                ]
+            )
+    
+            professor = st.text_input("Professor(a)")
+    
+            enviar = st.form_submit_button(
+                "🌹 Cadastrar matéria"
+            )
+    
+            if enviar:
+    
+                if nome:
+    
+                    try:
+                        supabase.table("materias").insert({
+                            "nome": nome,
+                            "semestre": semestre,
+                            "professor": professor
+                        }).execute()
+    
+                        st.success(
+                            f"'{nome}' foi salva permanentemente! 🌷"
+                        )
+    
+                        st.rerun()
+    
+                    except Exception as e:
+                        st.error("Erro ao salvar a matéria:")
+                        st.code(str(e))
+    
+                else:
+                    st.warning(
+                        "Digite o nome da matéria primeiro."
+                    )
+    
+        st.divider()
+    
+        st.subheader("📚 Disciplinas cadastradas")
+    
+        try:
+            resposta = supabase.table(
+                "materias"
+            ).select("*").execute()
+    
+            materias = resposta.data
+    
+        except Exception as e:
+            st.error("Erro ao consultar o Supabase:")
+            st.code(str(e))
+            materias = []
+    
+        if materias:
+    
+            for materia in materias:
+        
+                with st.container(
+                    border=True
+                ):
+        
+                    st.subheader(
+                        f"📚 {materia['nome']}"
+                    )
+        
+                    st.write(
+                        f"🎓 {materia['semestre']}"
+                    )
+        
+                    st.write(
+                        f"👩‍🏫 "
+                        f"{materia['professor'] or 'Professor não informado'}"
+                    )
+        
+        
+                    col1, col2 = st.columns(2)
+        
+        
+                    with col1:
+        
+                        if st.button(
+                            "✏️ Editar",
+                            key=f"editar_{materia['id']}",
+                            use_container_width=True
+                        ):
+        
+                            st.session_state[
+                                "materia_editando"
+                            ] = materia["id"]
+        
+                            st.rerun()
+        
+        
+                    with col2:
+        
+                        if st.button(
+                            "🗑️ Excluir",
+                            key=f"excluir_{materia['id']}",
+                            use_container_width=True
+                        ):
+        
+                            supabase.table(
+                                "materias"
+                            ).delete().eq(
+                                "id",
+                                materia["id"]
+                            ).execute()
+        
+                            st.rerun()
+        
+        
+                if (
+                    st.session_state.get(
+                        "materia_editando"
+                    )
+                    == materia["id"]
+                ):
+        
+                    st.divider()
+        
+                    st.subheader(
+                        f"✏️ Editando: {materia['nome']}"
+                    )
+        
+                    with st.form(
+                        f"form_editar_{materia['id']}"
+                    ):
+        
+                        novo_nome = st.text_input(
+                            "Nome da matéria",
+                            value=materia["nome"]
+                        )
+        
+                        novo_semestre = st.selectbox(
+                            "Semestre",
+                            [
+                                "1º semestre",
+                                "2º semestre",
+                                "3º semestre",
+                                "4º semestre",
+                                "5º semestre",
+                                "6º semestre",
+                                "7º semestre",
+                                "8º semestre"
+                            ],
+                            index=[
+                                "1º semestre",
+                                "2º semestre",
+                                "3º semestre",
+                                "4º semestre",
+                                "5º semestre",
+                                "6º semestre",
+                                "7º semestre",
+                                "8º semestre"
+                            ].index(
+                                materia["semestre"]
+                            )
+                        )
+        
+                        novo_professor = st.text_input(
+                            "Professor(a)",
+                            value=materia["professor"] or ""
+                        )
+        
+        
+                        salvar = st.form_submit_button(
+                            "💾 Salvar alterações"
+                        )
+        
+        
+                        if salvar:
+        
+                            supabase.table(
+                                "materias"
+                            ).update({
+        
+                                "nome": novo_nome,
+        
+                                "semestre": novo_semestre,
+        
+                                "professor": novo_professor
+        
+                            }).eq(
+                                "id",
+                                materia["id"]
+                            ).execute()
+        
+        
+                            st.session_state[
+                                "materia_editando"
+                            ] = None
+        
+                            st.rerun()
+    
+        else:
+    
+            st.info(
+                "Você ainda não cadastrou nenhuma matéria."
+            )
 
 
 elif pagina == "⏱️ Estudar":
