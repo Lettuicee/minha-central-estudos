@@ -647,13 +647,24 @@ elif pagina == "⏱️ Estudar":
                 "coelho_y": coelho_y
             },
             key="meu_quarto",
-            on_livros_movidos_change=lambda: None
+            on_livros_movidos_change=lambda: None,
+            on_coelho_movido_change=lambda: None
         )
 
         if resultado_quarto.livros_movidos:
 
             nova_posicao = (
                 resultado_quarto.livros_movidos
+            )
+
+            novo_x = nova_posicao["x"]
+
+            novo_y = nova_posicao["y"]
+
+        if resultado_quarto.coelho_movido:
+
+            nova_posicao = (
+                resultado_quarto.coelho_movido
             )
 
             novo_x = nova_posicao["x"]
