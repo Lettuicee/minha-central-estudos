@@ -471,7 +471,7 @@ elif pagina == "📚 Matérias":
                 f"{materia['professor'] or 'Professor não informado'}"
             )
 
-           st.divider()
+            st.divider()
 
             st.subheader("📖 Conteúdos da matéria")
 
