@@ -165,9 +165,7 @@ quarto_interativo = st.components.v2.component(
                 }
 
                 let arrastando = false;
-
                 let deslocamentoX = 0;
-
                 let deslocamentoY = 0;
 
 
@@ -176,16 +174,16 @@ quarto_interativo = st.components.v2.component(
 
                         arrastando = true;
 
-                        const rect =
+                        const elementoRect =
                             elemento.getBoundingClientRect();
 
                         deslocamentoX =
                             evento.clientX
-                            - rect.left;
+                            - elementoRect.left;
 
                         deslocamentoY =
                             evento.clientY
-                            - rect.top;
+                            - elementoRect.top;
 
                         elemento.style.cursor =
                             "grabbing";
@@ -194,7 +192,7 @@ quarto_interativo = st.components.v2.component(
                     };
 
 
-                document.onmousemove =
+                elemento.onmousemove =
                     function(evento) {
 
                         if (!arrastando) {
@@ -240,7 +238,7 @@ quarto_interativo = st.components.v2.component(
                     };
 
 
-                document.onmouseup =
+                elemento.onmouseup =
                     function() {
 
                         if (!arrastando) {
@@ -288,7 +286,6 @@ quarto_interativo = st.components.v2.component(
                         );
                     };
             }
-
 
             tornarArrastavel(
                 livros,
