@@ -37,12 +37,12 @@ quarto_interativo = st.components.v2.component(
         }
 
         #livros {
-            width: 18%;
+            width: 12%;
             z-index: 2;
         }
 
         #coelho {
-            width: 39%;
+            width: 25%;
             z-index: 3;
         }
     """,
