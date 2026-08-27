@@ -7,44 +7,46 @@ from zoneinfo import ZoneInfo
 
 quarto_interativo = st.components.v2.component(
     "quarto_interativo",
+
     html="""
         <div id="cenario"></div>
     """,
+
     css="""
         #cenario {
-            width: 700px;
-            max-width: 100%;
-            margin: 0 auto;
+            width: 100%;
+            height: 100%;
         }
 
         #quarto {
             position: relative;
             width: 700px;
             max-width: 100%;
+            margin: 0 auto;
         }
 
         #fundo {
-            width: 700px;
-            max-width: 100%;
+            width: 100%;
             display: block;
         }
 
-        #livros {
+        .movel {
             position: absolute;
-            width: 18%;
             cursor: grab;
             user-select: none;
+        }
+
+        #livros {
+            width: 18%;
             z-index: 2;
         }
 
         #coelho {
-            position: absolute;
             width: 39%;
-            cursor: grab;
-            user-select: none;
             z-index: 3;
         }
     """,
+
     js="""
         export default function(component) {
 
@@ -54,57 +56,108 @@ quarto_interativo = st.components.v2.component(
                 setTriggerValue
             } = component;
 
-            const cenario = parentElement.querySelector(
-                "#cenario"
-            );
-
             if (!data) {
                 return;
             }
 
-            cenario.innerHTML = `
-                <div id="quarto">
+            const cenario = parentElement.querySelector(
+                "#cenario"
+            );
 
-                    <img
-                        id="fundo"
-                        src="data:image/png;base64,${data.quarto}"
-                    >
+            let quarto = cenario.querySelector(
+                "#quarto"
+            );
 
-                    ${
-                        data.livros_comprados
-                        ? `
-                            <img
-                                id="livros"
-                                src="data:image/png;base64,${data.livros}"
-                                style="
-                                    left: ${data.livros_x}%;
-                                    top: ${data.livros_y}%;
-                                "
-                            >
-                        `
-                        : ""
-                    }
+            if (!quarto) {
 
-                    <img
-                        id="coelho"
-                        src="data:image/png;base64,${data.coelho}"
-                        style="
-                            left: ${data.coelho_x}%;
-                            top: ${data.coelho_y}%;
-                        "
-                    >
+                quarto = document.createElement("div");
 
-                </div>
-            `;
+                quarto.id = "quarto";
 
-            const livros = cenario.querySelector("#livros");
-            const quarto = cenario.querySelector("#quarto");
-            const coelho = cenario.querySelector("#coelho");
+                const fundo =
+                    document.createElement("img");
+
+                fundo.id = "fundo";
+
+                quarto.appendChild(fundo);
+
+                cenario.appendChild(quarto);
+            }
+
+
+            const fundo = quarto.querySelector(
+                "#fundo"
+            );
+
+            fundo.src =
+                "data:image/png;base64," +
+                data.quarto;
+
+
+            let livros = quarto.querySelector(
+                "#livros"
+            );
+
+            if (data.livros_comprados) {
+
+                if (!livros) {
+
+                    livros =
+                        document.createElement("img");
+
+                    livros.id = "livros";
+
+                    livros.className = "movel";
+
+                    quarto.appendChild(livros);
+                }
+
+                livros.src =
+                    "data:image/png;base64," +
+                    data.livros;
+
+                livros.style.left =
+                    data.livros_x + "%";
+
+                livros.style.top =
+                    data.livros_y + "%";
+
+            } else if (livros) {
+
+                livros.remove();
+            }
+
+
+            let coelho = quarto.querySelector(
+                "#coelho"
+            );
+
+            if (!coelho) {
+
+                coelho =
+                    document.createElement("img");
+
+                coelho.id = "coelho";
+
+                coelho.className = "movel";
+
+                quarto.appendChild(coelho);
+            }
+
+            coelho.src =
+                "data:image/png;base64," +
+                data.coelho;
+
+            coelho.style.left =
+                data.coelho_x + "%";
+
+            coelho.style.top =
+                data.coelho_y + "%";
 
 
             function tornarArrastavel(
                 elemento,
-                nomeEvento
+                nomeObjeto
             ) {
 
                 if (!elemento) {
@@ -112,37 +165,36 @@ quarto_interativo = st.components.v2.component(
                 }
 
                 let arrastando = false;
+
                 let deslocamentoX = 0;
+
                 let deslocamentoY = 0;
 
 
-                elemento.addEventListener(
-                    "mousedown",
+                elemento.onmousedown =
                     function(evento) {
 
                         arrastando = true;
 
-                        const elementoRect =
+                        const rect =
                             elemento.getBoundingClientRect();
 
                         deslocamentoX =
                             evento.clientX
-                            - elementoRect.left;
+                            - rect.left;
 
                         deslocamentoY =
                             evento.clientY
-                            - elementoRect.top;
+                            - rect.top;
 
                         elemento.style.cursor =
                             "grabbing";
 
                         evento.preventDefault();
-                    }
-                );
+                    };
 
 
-                document.addEventListener(
-                    "mousemove",
+                document.onmousemove =
                     function(evento) {
 
                         if (!arrastando) {
@@ -152,12 +204,12 @@ quarto_interativo = st.components.v2.component(
                         const quartoRect =
                             quarto.getBoundingClientRect();
 
-                        let novaPosicaoX =
+                        let x =
                             evento.clientX
                             - quartoRect.left
                             - deslocamentoX;
 
-                        let novaPosicaoY =
+                        let y =
                             evento.clientY
                             - quartoRect.top
                             - deslocamentoY;
@@ -170,41 +222,25 @@ quarto_interativo = st.components.v2.component(
                             quartoRect.height
                             - elemento.offsetHeight;
 
-                        novaPosicaoX =
-                            Math.max(
-                                0,
-                                Math.min(
-                                    novaPosicaoX,
-                                    maxX
-                                )
-                            );
+                        x = Math.max(
+                            0,
+                            Math.min(x, maxX)
+                        );
 
-                        novaPosicaoY =
-                            Math.max(
-                                0,
-                                Math.min(
-                                    novaPosicaoY,
-                                    maxY
-                                )
-                            );
+                        y = Math.max(
+                            0,
+                            Math.min(y, maxY)
+                        );
 
                         elemento.style.left =
-                            novaPosicaoX + "px";
+                            x + "px";
 
                         elemento.style.top =
-                            novaPosicaoY + "px";
-
-                        elemento.style.bottom =
-                            "auto";
-
-                        elemento.style.transform =
-                            "none";
-                    }
-                );
+                            y + "px";
+                    };
 
 
-                document.addEventListener(
-                    "mouseup",
+                document.onmouseup =
                     function() {
 
                         if (!arrastando) {
@@ -222,42 +258,46 @@ quarto_interativo = st.components.v2.component(
                         const elementoRect =
                             elemento.getBoundingClientRect();
 
-                        const posicaoX =
-                            (
-                                elementoRect.left
-                                - quartoRect.left
-                            )
-                            / quartoRect.width
-                            * 100;
+                        const x =
+                            Math.round(
+                                (
+                                    elementoRect.left
+                                    - quartoRect.left
+                                )
+                                / quartoRect.width
+                                * 100
+                            );
 
-                        const posicaoY =
-                            (
-                                elementoRect.top
-                                - quartoRect.top
-                            )
-                            / quartoRect.height
-                            * 100;
-    
+                        const y =
+                            Math.round(
+                                (
+                                    elementoRect.top
+                                    - quartoRect.top
+                                )
+                                / quartoRect.height
+                                * 100
+                            );
+
                         setTriggerValue(
-                            nomeEvento,
+                            "objeto_movido",
                             {
-                                x: Math.round(posicaoX),
-                                y: Math.round(posicaoY)
+                                objeto: nomeObjeto,
+                                x: x,
+                                y: y
                             }
                         );
-                    }
-                );
+                    };
             }
 
 
             tornarArrastavel(
                 livros,
-                "livros_movidos"
+                "livros"
             );
 
             tornarArrastavel(
                 coelho,
-                "coelho_movido"
+                "coelho"
             );
         }
     """
