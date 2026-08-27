@@ -471,12 +471,103 @@ elif pagina == "📚 Matérias":
                 f"{materia['professor'] or 'Professor não informado'}"
             )
 
-            st.divider()
+           st.divider()
 
-            st.info(
-                "Em breve vamos colocar aqui os tópicos, "
-                "anotações, links e histórico de estudos. 📚"
-            )
+            st.subheader("📖 Conteúdos da matéria")
+
+            with st.form("form_novo_topico"):
+
+                titulo_topico = st.text_input(
+                    "Nome da aula ou tópico"
+                )
+
+                adicionar_topico = (
+                    st.form_submit_button(
+                        "➕ Adicionar"
+                    )
+                )
+
+                if adicionar_topico:
+
+                    if titulo_topico:
+
+                        try:
+
+                            supabase.table(
+                                "topicos"
+                            ).insert({
+
+                                "materia_id": materia["id"],
+
+                                "titulo": titulo_topico
+
+                            }).execute()
+
+                            st.rerun()
+
+                        except Exception as e:
+
+                            st.error(
+                                "Erro ao salvar o tópico:"
+                            )
+
+                            st.code(str(e))
+
+                    else:
+
+                        st.warning(
+                            "Digite o nome do tópico."
+                        )
+
+
+            try:
+
+                resposta_topicos = (
+                    supabase
+                    .table("topicos")
+                    .select("*")
+                    .eq(
+                        "materia_id",
+                        materia["id"]
+                    )
+                    .order(
+                        "criado_em"
+                    )
+                    .execute()
+                )
+
+                topicos = resposta_topicos.data
+
+            except Exception as e:
+
+                st.error(
+                    "Erro ao carregar os tópicos:"
+                )
+
+                st.code(str(e))
+
+                topicos = []
+
+
+            if topicos:
+
+                for topico in topicos:
+
+                    with st.expander(
+                        f"📖 {topico['titulo']}"
+                    ):
+
+                        st.write(
+                            "Ainda vamos construir "
+                            "o conteúdo deste tópico. 📚"
+                        )
+
+            else:
+
+                st.info(
+                    "Você ainda não adicionou nenhum "
+                    "tópico nesta matéria."
+                )
 
         else:
 
