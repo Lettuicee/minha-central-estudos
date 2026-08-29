@@ -552,13 +552,17 @@ elif pagina == "📚 Matérias":
                 topicos = []
 
 
-            if topicos:
+           if topicos:
 
                 for topico in topicos:
             
                     with st.expander(
                         f"📖 {topico['titulo']}"
                     ):
+            
+                        # =========================
+                        # ANOTAÇÕES
+                        # =========================
             
                         conteudo_atual = (
                             topico["conteudo"] or ""
@@ -607,9 +611,92 @@ elif pagina == "📚 Matérias":
                                     )
             
                                     st.code(str(e))
-
+            
+            
+                        st.divider()
+            
+            
+                        # =========================
+                        # EDITAR TÍTULO
+                        # =========================
+            
+                        with st.form(
+                            f"form_editar_topico_{topico['id']}"
+                        ):
+            
+                            novo_titulo = st.text_input(
+                                "✏️ Nome do tópico",
+                                value=topico["titulo"]
+                            )
+            
+                            salvar_titulo = (
+                                st.form_submit_button(
+                                    "💾 Salvar nome"
+                                )
+                            )
+            
+                            if salvar_titulo:
+            
+                                if novo_titulo.strip():
+            
+                                    try:
+            
+                                        supabase.table(
+                                            "topicos"
+                                        ).update({
+                                            "titulo": novo_titulo
+                                        }).eq(
+                                            "id",
+                                            topico["id"]
+                                        ).execute()
+            
+                                        st.rerun()
+            
+                                    except Exception as e:
+            
+                                        st.error(
+                                            "Erro ao editar o tópico:"
+                                        )
+            
+                                        st.code(str(e))
+            
+                                else:
+            
+                                    st.warning(
+                                        "O tópico precisa ter um nome."
+                                    )
+            
+            
+                        # =========================
+                        # EXCLUIR
+                        # =========================
+            
+                        if st.button(
+                            "🗑️ Excluir tópico",
+                            key=f"excluir_topico_{topico['id']}"
+                        ):
+            
+                            try:
+            
+                                supabase.table(
+                                    "topicos"
+                                ).delete().eq(
+                                    "id",
+                                    topico["id"]
+                                ).execute()
+            
+                                st.rerun()
+            
+                            except Exception as e:
+            
+                                st.error(
+                                    "Erro ao excluir o tópico:"
+                                )
+            
+                                st.code(str(e))
+            
             else:
-
+            
                 st.info(
                     "Você ainda não adicionou nenhum "
                     "tópico nesta matéria."
