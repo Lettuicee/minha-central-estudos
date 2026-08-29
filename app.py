@@ -702,6 +702,115 @@ elif pagina == "📚 Matérias":
                     "tópico nesta matéria."
                 )
 
+
+            st.divider()
+
+            st.subheader("⏱️ Histórico de estudos")
+
+            try:
+
+                resposta_historico = (
+                    supabase
+                    .table("sessoes_estudo")
+                    .select("*")
+                    .eq(
+                        "materia_nome",
+                        materia["nome"]
+                    )
+                    .order(
+                        "criado_em",
+                        desc=True
+                    )
+                    .execute()
+                )
+
+                historico_materia = (
+                    resposta_historico.data
+                )
+
+            except Exception as e:
+
+                st.error(
+                    "Erro ao carregar o histórico:"
+                )
+
+                st.code(str(e))
+
+                historico_materia = []
+
+
+            if historico_materia:
+
+                for sessao in historico_materia:
+
+                    segundos = (
+                        sessao["duracao_segundos"]
+                    )
+
+                    horas = int(
+                        segundos // 3600
+                    )
+
+                    minutos = int(
+                        (segundos % 3600) // 60
+                    )
+
+                    segundos_restantes = int(
+                        segundos % 60
+                    )
+
+                    if horas > 0:
+
+                        duracao = (
+                            f"{horas}h "
+                            f"{minutos:02d}min"
+                        )
+
+                    else:
+
+                        duracao = (
+                            f"{minutos}min "
+                            f"{segundos_restantes:02d}s"
+                        )
+
+
+                    data_sessao = datetime.fromisoformat(
+                        sessao["criado_em"]
+                        .replace("Z", "+00:00")
+                    )
+
+                    data_sao_paulo = (
+                        data_sessao.astimezone(
+                            ZoneInfo("America/Sao_Paulo")
+                        )
+                    )
+
+                    data_formatada = (
+                        data_sao_paulo.strftime(
+                            "%d/%m/%Y às %H:%M"
+                        )
+                    )
+
+
+                    st.markdown(
+                        f"""
+                        **📚 Sessão de estudo**
+
+                        ⏱️ {duracao}
+
+                        🕐 {data_formatada}
+
+                        ---
+                        """
+                    )
+
+            else:
+
+                st.info(
+                    "Nenhuma sessão de estudo "
+                    "registrada para esta matéria ainda. 🌷"
+                )
+
         else:
 
             st.warning(
