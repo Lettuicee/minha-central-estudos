@@ -552,7 +552,7 @@ elif pagina == "📚 Matérias":
                 topicos = []
 
 
-           if topicos:
+            if topicos:
 
                 for topico in topicos:
             
