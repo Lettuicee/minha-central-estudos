@@ -554,33 +554,97 @@ elif pagina == "📚 Matérias":
 
                 topicos = []
 
-            if topicos:
+            # ==========================================
+            # PÁGINA DA AULA
+            # ==========================================
 
-                for topico in topicos:
+            if st.session_state.topico_aberto is not None:
 
-                    # =========================
-                    # BOTÃO PARA ABRIR A AULA
-                    # =========================
+                resposta_topico = (
+                    supabase
+                    .table("topicos")
+                    .select("*")
+                    .eq(
+                        "id",
+                        st.session_state.topico_aberto
+                    )
+                    .execute()
+                )
+
+                if resposta_topico.data:
+
+                    topico_aberto = (
+                        resposta_topico.data[0]
+                    )
 
                     if st.button(
-                        f"📖 {topico['titulo']}",
-                        key=f"abrir_topico_{topico['id']}",
-                        use_container_width=True
+                        "← Voltar para a matéria"
                     ):
 
-                        st.session_state.topico_aberto = (
-                            topico["id"]
-                        )
+                        st.session_state.topico_aberto = None
 
                         st.rerun()
 
+                    st.title(
+                        f"📖 {topico_aberto['titulo']}"
+                    )
+
+                    st.divider()
+
+                    st.subheader("📝 Anotações")
+
+                    if topico_aberto["conteudo"]:
+
+                        st.write(
+                            topico_aberto["conteudo"]
+                        )
+
+                    else:
+
+                        st.info(
+                            "Esta aula ainda não possui "
+                            "anotações."
+                        )
+
+                else:
+
+                    st.warning(
+                        "Esta aula não foi encontrada."
+                    )
+
+                    st.session_state.topico_aberto = None
+
+                    st.rerun()
+
+
+            # ==========================================
+            # LISTA DE AULAS
+            # ==========================================
 
             else:
 
-                st.info(
-                    "Você ainda não adicionou nenhum "
-                    "tópico nesta matéria."
-                )
+                if topicos:
+
+                    for topico in topicos:
+
+                        if st.button(
+                            f"📖 {topico['titulo']}",
+                            key=f"abrir_topico_{topico['id']}",
+                            use_container_width=True
+                        ):
+
+                            st.session_state.topico_aberto = (
+                                topico["id"]
+                            )
+
+                            st.rerun()
+
+                else:
+
+                    st.info(
+                        "Você ainda não adicionou nenhum "
+                        "tópico nesta matéria."
+                    )
                 
             st.divider()
 
