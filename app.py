@@ -741,38 +741,9 @@ elif pagina == "📚 Matérias":
 
             if historico_materia:
 
+                historico_por_dia = {}
+
                 for sessao in historico_materia:
-
-                    segundos = (
-                        sessao["duracao_segundos"]
-                    )
-
-                    horas = int(
-                        segundos // 3600
-                    )
-
-                    minutos = int(
-                        (segundos % 3600) // 60
-                    )
-
-                    segundos_restantes = int(
-                        segundos % 60
-                    )
-
-                    if horas > 0:
-
-                        duracao = (
-                            f"{horas}h "
-                            f"{minutos:02d}min"
-                        )
-
-                    else:
-
-                        duracao = (
-                            f"{minutos}min "
-                            f"{segundos_restantes:02d}s"
-                        )
-
 
                     data_sessao = datetime.fromisoformat(
                         sessao["criado_em"]
@@ -785,24 +756,117 @@ elif pagina == "📚 Matérias":
                         )
                     )
 
-                    data_formatada = (
-                        data_sao_paulo.strftime(
-                            "%d/%m/%Y às %H:%M"
+                    dia = data_sao_paulo.strftime(
+                        "%d/%m/%Y"
+                    )
+
+                    if dia not in historico_por_dia:
+
+                        historico_por_dia[dia] = []
+
+                    historico_por_dia[dia].append(
+                        (
+                            sessao,
+                            data_sao_paulo
                         )
                     )
 
 
-                    st.markdown(
-                        f"""
-                        **📚 Sessão de estudo**
+                for dia, sessoes_do_dia in (
+                    historico_por_dia.items()
+                ):
 
-                        ⏱️ {duracao}
+                    with st.expander(
+                        f"📅 {dia}"
+                    ):
 
-                        🕐 {data_formatada}
+                        total_segundos = sum(
+                            sessao["duracao_segundos"]
+                            for sessao, _ in sessoes_do_dia
+                        )
 
-                        ---
-                        """
-                    )
+                        horas_total = int(
+                            total_segundos // 3600
+                        )
+
+                        minutos_total = int(
+                            (total_segundos % 3600) // 60
+                        )
+
+                        if horas_total > 0:
+
+                            total_formatado = (
+                                f"{horas_total}h "
+                                f"{minutos_total:02d}min"
+                            )
+
+                        else:
+
+                            total_formatado = (
+                                f"{minutos_total}min"
+                            )
+
+
+                        st.caption(
+                            f"⏱️ Total estudado: "
+                            f"{total_formatado}"
+                        )
+
+
+                        for sessao, data_sao_paulo in (
+                            sessoes_do_dia
+                        ):
+
+                            segundos = (
+                                sessao[
+                                    "duracao_segundos"
+                                ]
+                            )
+
+                            horas = int(
+                                segundos // 3600
+                            )
+
+                            minutos = int(
+                                (segundos % 3600) // 60
+                            )
+
+                            segundos_restantes = int(
+                                segundos % 60
+                            )
+
+
+                            if horas > 0:
+
+                                duracao = (
+                                    f"{horas}h "
+                                    f"{minutos:02d}min"
+                                )
+
+                            else:
+
+                                duracao = (
+                                    f"{minutos}min "
+                                    f"{segundos_restantes:02d}s"
+                                )
+
+
+                            horario = (
+                                data_sao_paulo.strftime(
+                                    "%H:%M"
+                                )
+                            )
+
+
+                            st.markdown(
+                                f"""
+                                ⏱️ **{duracao}**
+
+                                🕐 {horario}
+
+                                ---
+                                """
+                            )
 
             else:
 
