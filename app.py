@@ -328,6 +328,9 @@ if "livros_comprados" not in st.session_state:
 
 if "materia_aberta" not in st.session_state:
     st.session_state.materia_aberta = None
+
+if "topico_aberto" not in st.session_state:
+    st.session_state.topico_aberto = None
     
 st.set_page_config(
     page_title="Minha Central de Estudos",
@@ -551,158 +554,34 @@ elif pagina == "📚 Matérias":
 
                 topicos = []
 
-
             if topicos:
 
                 for topico in topicos:
-            
-                    with st.expander(
-                        f"📖 {topico['titulo']}"
+
+                    # =========================
+                    # BOTÃO PARA ABRIR A AULA
+                    # =========================
+
+                    if st.button(
+                        f"📖 {topico['titulo']}",
+                        key=f"abrir_topico_{topico['id']}",
+                        use_container_width=True
                     ):
-            
-                        # =========================
-                        # ANOTAÇÕES
-                        # =========================
-            
-                        conteudo_atual = (
-                            topico["conteudo"] or ""
+
+                        st.session_state.topico_aberto = (
+                            topico["id"]
                         )
-            
-                        with st.form(
-                            f"form_conteudo_{topico['id']}"
-                        ):
-            
-                            novo_conteudo = st.text_area(
-                                "📝 Anotações",
-                                value=conteudo_atual,
-                                height=250,
-                                key=f"conteudo_{topico['id']}"
-                            )
-            
-                            salvar_conteudo = (
-                                st.form_submit_button(
-                                    "💾 Salvar anotações"
-                                )
-                            )
-            
-                            if salvar_conteudo:
-            
-                                try:
-            
-                                    supabase.table(
-                                        "topicos"
-                                    ).update({
-                                        "conteudo": novo_conteudo
-                                    }).eq(
-                                        "id",
-                                        topico["id"]
-                                    ).execute()
-            
-                                    st.success(
-                                        "Anotações salvas! 📚"
-                                    )
-            
-                                    st.rerun()
-            
-                                except Exception as e:
-            
-                                    st.error(
-                                        "Erro ao salvar as anotações:"
-                                    )
-            
-                                    st.code(str(e))
-            
-            
-                        st.divider()
-            
-            
-                        # =========================
-                        # EDITAR TÍTULO
-                        # =========================
-            
-                        with st.form(
-                            f"form_editar_topico_{topico['id']}"
-                        ):
-            
-                            novo_titulo = st.text_input(
-                                "✏️ Nome do tópico",
-                                value=topico["titulo"]
-                            )
-            
-                            salvar_titulo = (
-                                st.form_submit_button(
-                                    "💾 Salvar nome"
-                                )
-                            )
-            
-                            if salvar_titulo:
-            
-                                if novo_titulo.strip():
-            
-                                    try:
-            
-                                        supabase.table(
-                                            "topicos"
-                                        ).update({
-                                            "titulo": novo_titulo
-                                        }).eq(
-                                            "id",
-                                            topico["id"]
-                                        ).execute()
-            
-                                        st.rerun()
-            
-                                    except Exception as e:
-            
-                                        st.error(
-                                            "Erro ao editar o tópico:"
-                                        )
-            
-                                        st.code(str(e))
-            
-                                else:
-            
-                                    st.warning(
-                                        "O tópico precisa ter um nome."
-                                    )
-            
-            
-                        # =========================
-                        # EXCLUIR
-                        # =========================
-            
-                        if st.button(
-                            "🗑️ Excluir tópico",
-                            key=f"excluir_topico_{topico['id']}"
-                        ):
-            
-                            try:
-            
-                                supabase.table(
-                                    "topicos"
-                                ).delete().eq(
-                                    "id",
-                                    topico["id"]
-                                ).execute()
-            
-                                st.rerun()
-            
-                            except Exception as e:
-            
-                                st.error(
-                                    "Erro ao excluir o tópico:"
-                                )
-            
-                                st.code(str(e))
-            
+
+                        st.rerun()
+
+
             else:
-            
+
                 st.info(
                     "Você ainda não adicionou nenhum "
                     "tópico nesta matéria."
                 )
-
-
+                
             st.divider()
 
             st.subheader("⏱️ Histórico de estudos")
