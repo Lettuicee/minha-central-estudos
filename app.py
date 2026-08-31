@@ -1634,32 +1634,45 @@ elif pagina == "📚 Matérias":
             # ANOTAÇÕES
             # -------------------------------------------------
 
-            
             st.subheader("📝 Anotações")
 
+
+            conteudo_inicial = (
+                topico_aberto["conteudo"]
+                or ""
+            )
+            
+            
             resultado_editor = editor_anotacoes(
                 data={
-                    "conteudo": (
-                        topico["conteudo"]
-                        or ""
-                    )
+                    "conteudo": conteudo_inicial
                 },
-                key=f"editor_{topico['id']}",
+            
+                default={
+                    "conteudo": conteudo_inicial
+                },
+            
+                key=f"editor_{topico_aberto['id']}",
+            
                 on_conteudo_change=lambda: None
             )
-
-
-            if resultado_editor.conteudo:
+            
+            
+            if resultado_editor.conteudo is not None:
             
                 try:
             
                     supabase.table(
                         "topicos"
                     ).update({
+            
                         "conteudo": resultado_editor.conteudo
+            
                     }).eq(
+            
                         "id",
                         topico_aberto["id"]
+            
                     ).execute()
             
                 except Exception as e:
