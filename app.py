@@ -5,6 +5,308 @@ from supabase import create_client
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+editor_anotacoes = st.components.v2.component(
+    "editor_anotacoes",
+
+    html="""
+        <div id="editor">
+
+            <div id="barra">
+
+                <button type="button" data-comando="bold">
+                    <b>B</b>
+                </button>
+
+                <button type="button" data-comando="italic">
+                    <i>I</i>
+                </button>
+
+                <button type="button" data-comando="underline">
+                    <u>U</u>
+                </button>
+
+                <select id="tamanho">
+                    <option value="3">Normal</option>
+                    <option value="4">Grande</option>
+                    <option value="5">Muito grande</option>
+                    <option value="6">Título</option>
+                </select>
+
+                <input
+                    id="cor"
+                    type="color"
+                    value="#000000"
+                    title="Cor do texto"
+                >
+
+                <button type="button" data-comando="insertUnorderedList">
+                    • Lista
+                </button>
+
+                <button type="button" id="link">
+                    🔗 Link
+                </button>
+
+            </div>
+
+            <div
+                id="pagina"
+                contenteditable="true"
+                spellcheck="true"
+            ></div>
+
+        </div>
+    """,
+
+    css="""
+        #editor {
+            width: 100%;
+            box-sizing: border-box;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #d8d0ca;
+        }
+
+        #barra {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px;
+            background: #f5f1ed;
+            border-bottom: 1px solid #ddd5cf;
+            flex-wrap: wrap;
+        }
+
+        #barra button,
+        #barra select {
+            border: 1px solid #d2c8c0;
+            background: white;
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+            color: #332b28;
+        }
+
+        #barra button:hover {
+            background: #eee7e1;
+        }
+
+        #cor {
+            width: 34px;
+            height: 32px;
+            border: none;
+            padding: 2px;
+            cursor: pointer;
+        }
+
+        #pagina {
+            min-height: 550px;
+            padding: 35px;
+            outline: none;
+            color: #222;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            background: white;
+        }
+
+        #pagina:focus {
+            outline: none;
+        }
+
+        #pagina:empty::before {
+            content: "Comece a escrever suas anotações...";
+            color: #aaa;
+        }
+    """,
+
+    js="""
+        export default function(component) {
+
+            const {
+                data,
+                parentElement,
+                setStateValue
+            } = component;
+
+
+            const pagina =
+                parentElement.querySelector("#pagina");
+
+
+            const botoes =
+                parentElement.querySelectorAll(
+                    "[data-comando]"
+                );
+
+
+            const tamanho =
+                parentElement.querySelector("#tamanho");
+
+
+            const cor =
+                parentElement.querySelector("#cor");
+
+
+            const link =
+                parentElement.querySelector("#link");
+
+
+            if (!pagina) {
+                return;
+            }
+
+
+            // =========================================
+            // CARREGAR CONTEÚDO SALVO
+            // =========================================
+
+            if (
+                data &&
+                data.conteudo !== undefined &&
+                pagina.innerHTML === ""
+            ) {
+
+                pagina.innerHTML =
+                    data.conteudo || "";
+
+            }
+
+
+            // =========================================
+            // BOTÕES DE FORMATAÇÃO
+            // =========================================
+
+            botoes.forEach(
+                function(botao) {
+
+                    botao.addEventListener(
+                        "mousedown",
+                        function(evento) {
+
+                            evento.preventDefault();
+
+                            const comando =
+                                botao.dataset.comando;
+
+                            document.execCommand(
+                                comando,
+                                false,
+                                null
+                            );
+
+                            pagina.focus();
+
+                            enviarConteudo();
+                        }
+                    );
+
+                }
+            );
+
+
+            // =========================================
+            // TAMANHO
+            // =========================================
+
+            tamanho.addEventListener(
+                "change",
+                function() {
+
+                    document.execCommand(
+                        "formatBlock",
+                        false,
+                        "h" + tamanho.value
+                    );
+
+                    pagina.focus();
+
+                    enviarConteudo();
+                }
+            );
+
+
+            // =========================================
+            // COR
+            // =========================================
+
+            cor.addEventListener(
+                "input",
+                function() {
+
+                    document.execCommand(
+                        "foreColor",
+                        false,
+                        cor.value
+                    );
+
+                    pagina.focus();
+
+                    enviarConteudo();
+                }
+            );
+
+
+            // =========================================
+            // LINK
+            // =========================================
+
+            link.addEventListener(
+                "mousedown",
+                function(evento) {
+
+                    evento.preventDefault();
+
+                    const url =
+                        prompt(
+                            "Digite o endereço do link:"
+                        );
+
+                    if (url) {
+
+                        document.execCommand(
+                            "createLink",
+                            false,
+                            url
+                        );
+
+                        pagina.focus();
+
+                        enviarConteudo();
+                    }
+
+                }
+            );
+
+
+            // =========================================
+            // SALVAR CONTEÚDO
+            // =========================================
+
+            function enviarConteudo() {
+
+                setStateValue(
+                    "conteudo",
+                    pagina.innerHTML
+                );
+
+            }
+
+
+            pagina.addEventListener(
+                "input",
+                function() {
+
+                    enviarConteudo();
+
+                }
+            );
+
+        }
+    """
+)
+
 quarto_interativo = st.components.v2.component(
     "quarto_interativo",
 
@@ -1332,79 +1634,40 @@ elif pagina == "📚 Matérias":
             # ANOTAÇÕES
             # -------------------------------------------------
 
-            st.subheader(
-                "📝 Anotações"
-            )
+            
+            st.subheader("📝 Anotações")
 
-
-            conteudo_atual = (
-                topico_aberto["conteudo"]
-                or ""
-            )
-
-
-            with st.form(
-                f"form_anotacoes_{topico_aberto['id']}"
-            ):
-
-                novo_conteudo = st.text_area(
-                    "",
-                    value=conteudo_atual,
-                    height=550,
-                    placeholder=(
-                        "Comece a escrever suas "
-                        "anotações aqui..."
-                    ),
-                    label_visibility="collapsed"
-                )
-
-
-                salvar_conteudo = (
-                    st.form_submit_button(
-                        "💾 Salvar anotações"
+            resultado_editor = editor_anotacoes(
+                data={
+                    "conteudo": (
+                        topico_aberto["conteudo"]
+                        or ""
                     )
-                )
-
-
-                if salvar_conteudo:
-
-                    try:
-
-                        supabase.table(
-                            "topicos"
-                        ).update({
-                            "conteudo": novo_conteudo
-                        }).eq(
-                            "id",
-                            topico_aberto["id"]
-                        ).execute()
-
-
-                        st.success(
-                            "Anotações salvas! 📚"
-                        )
-
-                        st.rerun()
-
-
-                    except Exception as e:
-
-                        st.error(
-                            "Erro ao salvar as anotações:"
-                        )
-
-                        st.code(str(e))
-
-
-        else:
-
-            st.warning(
-                "Esta aula não foi encontrada."
+                },
+                key=f"editor_{topico_aberto['id']}"
             )
 
-            st.session_state.topico_aberto = None
 
-            st.rerun()
+            if resultado_editor.conteudo:
+            
+                try:
+            
+                    supabase.table(
+                        "topicos"
+                    ).update({
+                        "conteudo": resultado_editor.conteudo
+                    }).eq(
+                        "id",
+                        topico_aberto["id"]
+                    ).execute()
+            
+                except Exception as e:
+            
+                    st.error(
+                        "Erro ao salvar as anotações:"
+                    )
+            
+                    st.code(str(e))
 
 elif pagina == "⏱️ Estudar":
 
