@@ -26,10 +26,10 @@ editor_anotacoes = st.components.v2.component(
                 </button>
 
                 <select id="tamanho">
-                    <option value="3">Normal</option>
-                    <option value="4">Grande</option>
-                    <option value="5">Muito grande</option>
-                    <option value="6">Título</option>
+                    <option value="p">Normal</option>
+                    <option value="h3">Grande</option>
+                    <option value="h2">Muito grande</option>
+                    <option value="h1">Título</option>
                 </select>
 
                 <input
@@ -217,7 +217,7 @@ editor_anotacoes = st.components.v2.component(
                     document.execCommand(
                         "formatBlock",
                         false,
-                        "h" + tamanho.value
+                        tamanho.value
                     );
 
                     pagina.focus();
