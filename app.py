@@ -435,48 +435,369 @@ if pagina == "🏠 Início":
 
 elif pagina == "📚 Matérias":
 
-    st.header("📚 Minhas matérias")
+    # =========================================================
+    # NÍVEL 1 — LISTA DE MATÉRIAS
+    # =========================================================
 
-    if st.session_state.materia_aberta is not None:
+    if st.session_state.materia_aberta is None:
+
+        st.header("📚 Minhas matérias")
+
+        with st.form(
+            "form_materia",
+            clear_on_submit=True
+        ):
+
+            nome = st.text_input(
+                "Nome da matéria"
+            )
+
+            semestre = st.selectbox(
+                "Semestre",
+                [
+                    "1º semestre",
+                    "2º semestre",
+                    "3º semestre",
+                    "4º semestre",
+                    "5º semestre",
+                    "6º semestre",
+                    "7º semestre",
+                    "8º semestre"
+                ]
+            )
+
+            professor = st.text_input(
+                "Professor(a)"
+            )
+
+            enviar = st.form_submit_button(
+                "🌹 Cadastrar matéria"
+            )
+
+            if enviar:
+
+                if nome:
+
+                    try:
+
+                        supabase.table(
+                            "materias"
+                        ).insert({
+                            "nome": nome,
+                            "semestre": semestre,
+                            "professor": professor
+                        }).execute()
+
+                        st.success(
+                            f"'{nome}' foi salva permanentemente! 🌷"
+                        )
+
+                        st.rerun()
+
+                    except Exception as e:
+
+                        st.error(
+                            "Erro ao salvar a matéria:"
+                        )
+
+                        st.code(str(e))
+
+                else:
+
+                    st.warning(
+                        "Digite o nome da matéria primeiro."
+                    )
+
+
+        st.divider()
+
+        st.subheader(
+            "📚 Disciplinas cadastradas"
+        )
+
+
+        # =====================================================
+        # BUSCAR MATÉRIAS
+        # =====================================================
+
+        try:
+
+            resposta = (
+                supabase
+                .table("materias")
+                .select("*")
+                .execute()
+            )
+
+            materias = resposta.data
+
+        except Exception as e:
+
+            st.error(
+                "Erro ao consultar o Supabase:"
+            )
+
+            st.code(str(e))
+
+            materias = []
+
+
+        # =====================================================
+        # MOSTRAR MATÉRIAS
+        # =====================================================
+
+        if materias:
+
+            for materia in materias:
+
+                with st.container(
+                    border=True
+                ):
+
+                    st.subheader(
+                        f"📚 {materia['nome']}"
+                    )
+
+                    st.write(
+                        f"🎓 {materia['semestre']}"
+                    )
+
+                    st.write(
+                        f"👩‍🏫 "
+                        f"{materia['professor'] or 'Professor não informado'}"
+                    )
+
+
+                    # -----------------------------------------
+                    # ABRIR MATÉRIA
+                    # -----------------------------------------
+
+                    if st.button(
+                        "📖 Abrir matéria",
+                        key=f"abrir_{materia['id']}",
+                        use_container_width=True
+                    ):
+
+                        st.session_state.materia_aberta = (
+                            materia["id"]
+                        )
+
+                        st.session_state.topico_aberto = None
+
+                        st.rerun()
+
+
+                    col1, col2 = st.columns(2)
+
+
+                    # -----------------------------------------
+                    # EDITAR
+                    # -----------------------------------------
+
+                    with col1:
+
+                        if st.button(
+                            "✏️ Editar",
+                            key=f"editar_{materia['id']}",
+                            use_container_width=True
+                        ):
+
+                            st.session_state[
+                                "materia_editando"
+                            ] = materia["id"]
+
+                            st.rerun()
+
+
+                    # -----------------------------------------
+                    # EXCLUIR
+                    # -----------------------------------------
+
+                    with col2:
+
+                        if st.button(
+                            "🗑️ Excluir",
+                            key=f"excluir_{materia['id']}",
+                            use_container_width=True
+                        ):
+
+                            supabase.table(
+                                "materias"
+                            ).delete().eq(
+                                "id",
+                                materia["id"]
+                            ).execute()
+
+                            st.rerun()
+
+
+                # =================================================
+                # FORMULÁRIO DE EDIÇÃO
+                # =================================================
+
+                if (
+                    st.session_state.get(
+                        "materia_editando"
+                    )
+                    == materia["id"]
+                ):
+
+                    st.divider()
+
+                    st.subheader(
+                        f"✏️ Editando: {materia['nome']}"
+                    )
+
+                    with st.form(
+                        f"form_editar_{materia['id']}"
+                    ):
+
+                        novo_nome = st.text_input(
+                            "Nome da matéria",
+                            value=materia["nome"]
+                        )
+
+
+                        semestres = [
+                            "1º semestre",
+                            "2º semestre",
+                            "3º semestre",
+                            "4º semestre",
+                            "5º semestre",
+                            "6º semestre",
+                            "7º semestre",
+                            "8º semestre"
+                        ]
+
+
+                        novo_semestre = st.selectbox(
+                            "Semestre",
+                            semestres,
+                            index=semestres.index(
+                                materia["semestre"]
+                            )
+                        )
+
+
+                        novo_professor = st.text_input(
+                            "Professor(a)",
+                            value=materia["professor"] or ""
+                        )
+
+
+                        salvar = (
+                            st.form_submit_button(
+                                "💾 Salvar alterações"
+                            )
+                        )
+
+
+                        if salvar:
+
+                            supabase.table(
+                                "materias"
+                            ).update({
+
+                                "nome": novo_nome,
+
+                                "semestre": novo_semestre,
+
+                                "professor": novo_professor
+
+                            }).eq(
+                                "id",
+                                materia["id"]
+                            ).execute()
+
+
+                            st.session_state[
+                                "materia_editando"
+                            ] = None
+
+                            st.rerun()
+
+
+        else:
+
+            st.info(
+                "Você ainda não cadastrou nenhuma matéria."
+            )
+
+
+    # =========================================================
+    # NÍVEL 2 — MATÉRIA ABERTA
+    # =========================================================
+
+    elif st.session_state.topico_aberto is None:
 
         materia_aberta_id = (
             st.session_state.materia_aberta
         )
 
+
         resposta_materia = (
             supabase
             .table("materias")
             .select("*")
-            .eq("id", materia_aberta_id)
+            .eq(
+                "id",
+                materia_aberta_id
+            )
             .execute()
         )
+
 
         if resposta_materia.data:
 
             materia = resposta_materia.data[0]
 
-            if st.button("← Voltar para matérias"):
+
+            # -------------------------------------------------
+            # VOLTAR PARA LISTA DE MATÉRIAS
+            # -------------------------------------------------
+
+            if st.button(
+                "← Voltar para matérias"
+            ):
 
                 st.session_state.materia_aberta = None
 
+                st.session_state.topico_aberto = None
+
                 st.rerun()
+
+
+            # -------------------------------------------------
+            # TÍTULO DA MATÉRIA
+            # -------------------------------------------------
 
             st.title(
                 f"📚 {materia['nome']}"
             )
 
+
             st.write(
                 f"🎓 {materia['semestre']}"
             )
+
 
             st.write(
                 f"👩‍🏫 "
                 f"{materia['professor'] or 'Professor não informado'}"
             )
 
+
             st.divider()
 
-            st.subheader("📖 Conteúdos da matéria")
+
+            # =================================================
+            # CONTEÚDOS DA MATÉRIA
+            # =================================================
+
+            st.subheader(
+                "📖 Conteúdos da matéria"
+            )
+
 
             with st.form(
                 "form_novo_topico",
@@ -487,11 +808,13 @@ elif pagina == "📚 Matérias":
                     "Nome da aula ou tópico"
                 )
 
+
                 adicionar_topico = (
                     st.form_submit_button(
                         "➕ Adicionar"
                     )
                 )
+
 
                 if adicionar_topico:
 
@@ -511,6 +834,7 @@ elif pagina == "📚 Matérias":
 
                             st.rerun()
 
+
                         except Exception as e:
 
                             st.error(
@@ -525,6 +849,10 @@ elif pagina == "📚 Matérias":
                             "Digite o nome do tópico."
                         )
 
+
+            # =================================================
+            # BUSCAR TÓPICOS
+            # =================================================
 
             try:
 
@@ -544,6 +872,7 @@ elif pagina == "📚 Matérias":
 
                 topicos = resposta_topicos.data
 
+
             except Exception as e:
 
                 st.error(
@@ -554,101 +883,46 @@ elif pagina == "📚 Matérias":
 
                 topicos = []
 
-            # ==========================================
-            # PÁGINA DA AULA
-            # ==========================================
 
-            if st.session_state.topico_aberto is not None:
+            # =================================================
+            # LISTA DE TÓPICOS
+            # =================================================
 
-                resposta_topico = (
-                    supabase
-                    .table("topicos")
-                    .select("*")
-                    .eq(
-                        "id",
-                        st.session_state.topico_aberto
-                    )
-                    .execute()
-                )
+            if topicos:
 
-                if resposta_topico.data:
-
-                    topico_aberto = (
-                        resposta_topico.data[0]
-                    )
+                for topico in topicos:
 
                     if st.button(
-                        "← Voltar para a matéria"
+                        f"📖 {topico['titulo']}",
+                        key=f"abrir_topico_{topico['id']}",
+                        use_container_width=True
                     ):
 
-                        st.session_state.topico_aberto = None
+                        st.session_state.topico_aberto = (
+                            topico["id"]
+                        )
 
                         st.rerun()
 
-                    st.title(
-                        f"📖 {topico_aberto['titulo']}"
-                    )
-
-                    st.divider()
-
-                    st.subheader("📝 Anotações")
-
-                    if topico_aberto["conteudo"]:
-
-                        st.write(
-                            topico_aberto["conteudo"]
-                        )
-
-                    else:
-
-                        st.info(
-                            "Esta aula ainda não possui "
-                            "anotações."
-                        )
-
-                else:
-
-                    st.warning(
-                        "Esta aula não foi encontrada."
-                    )
-
-                    st.session_state.topico_aberto = None
-
-                    st.rerun()
-
-
-            # ==========================================
-            # LISTA DE AULAS
-            # ==========================================
 
             else:
 
-                if topicos:
+                st.info(
+                    "Você ainda não adicionou nenhum "
+                    "tópico nesta matéria."
+                )
 
-                    for topico in topicos:
 
-                        if st.button(
-                            f"📖 {topico['titulo']}",
-                            key=f"abrir_topico_{topico['id']}",
-                            use_container_width=True
-                        ):
+            # =================================================
+            # HISTÓRICO DA MATÉRIA
+            # =================================================
 
-                            st.session_state.topico_aberto = (
-                                topico["id"]
-                            )
-
-                            st.rerun()
-
-                else:
-
-                    st.info(
-                        "Você ainda não adicionou nenhum "
-                        "tópico nesta matéria."
-                    )
-                
             st.divider()
 
-            st.subheader("⏱️ Histórico de estudos")
+            st.subheader(
+                "⏱️ Histórico de estudos"
+            )
+
 
             try:
 
@@ -667,9 +941,11 @@ elif pagina == "📚 Matérias":
                     .execute()
                 )
 
+
                 historico_materia = (
                     resposta_historico.data
                 )
+
 
             except Exception as e:
 
@@ -686,26 +962,40 @@ elif pagina == "📚 Matérias":
 
                 historico_por_dia = {}
 
+
                 for sessao in historico_materia:
 
-                    data_sessao = datetime.fromisoformat(
-                        sessao["criado_em"]
-                        .replace("Z", "+00:00")
-                    )
-
-                    data_sao_paulo = (
-                        data_sessao.astimezone(
-                            ZoneInfo("America/Sao_Paulo")
+                    data_sessao = (
+                        datetime.fromisoformat(
+                            sessao["criado_em"]
+                            .replace(
+                                "Z",
+                                "+00:00"
+                            )
                         )
                     )
 
-                    dia = data_sao_paulo.strftime(
-                        "%d/%m/%Y"
+
+                    data_sao_paulo = (
+                        data_sessao.astimezone(
+                            ZoneInfo(
+                                "America/Sao_Paulo"
+                            )
+                        )
                     )
+
+
+                    dia = (
+                        data_sao_paulo.strftime(
+                            "%d/%m/%Y"
+                        )
+                    )
+
 
                     if dia not in historico_por_dia:
 
                         historico_por_dia[dia] = []
+
 
                     historico_por_dia[dia].append(
                         (
@@ -725,16 +1015,20 @@ elif pagina == "📚 Matérias":
 
                         total_segundos = sum(
                             sessao["duracao_segundos"]
-                            for sessao, _ in sessoes_do_dia
+                            for sessao, _
+                            in sessoes_do_dia
                         )
+
 
                         horas_total = int(
                             total_segundos // 3600
                         )
 
+
                         minutos_total = int(
                             (total_segundos % 3600) // 60
                         )
+
 
                         if horas_total > 0:
 
@@ -756,9 +1050,10 @@ elif pagina == "📚 Matérias":
                         )
 
 
-                        for sessao, data_sao_paulo in (
-                            sessoes_do_dia
-                        ):
+                        for (
+                            sessao,
+                            data_sao_paulo
+                        ) in sessoes_do_dia:
 
                             segundos = (
                                 sessao[
@@ -766,13 +1061,16 @@ elif pagina == "📚 Matérias":
                                 ]
                             )
 
+
                             horas = int(
                                 segundos // 3600
                             )
 
+
                             minutos = int(
                                 (segundos % 3600) // 60
                             )
+
 
                             segundos_restantes = int(
                                 segundos % 60
@@ -811,12 +1109,14 @@ elif pagina == "📚 Matérias":
                                 """
                             )
 
+
             else:
 
                 st.info(
                     "Nenhuma sessão de estudo "
                     "registrada para esta matéria ainda. 🌷"
                 )
+
 
         else:
 
@@ -827,237 +1127,133 @@ elif pagina == "📚 Matérias":
             st.session_state.materia_aberta = None
 
 
+    # =========================================================
+    # NÍVEL 3 — AULA ABERTA
+    # =========================================================
+
     else:
 
-        with st.form(
-            "form_materia",
-            clear_on_submit=True
-        ):
-    
-            nome = st.text_input("Nome da matéria")
-    
-            semestre = st.selectbox(
-                "Semestre",
-                [
-                    "1º semestre",
-                    "2º semestre",
-                    "3º semestre",
-                    "4º semestre",
-                    "5º semestre",
-                    "6º semestre",
-                    "7º semestre",
-                    "8º semestre"
-                ]
+        resposta_topico = (
+            supabase
+            .table("topicos")
+            .select("*")
+            .eq(
+                "id",
+                st.session_state.topico_aberto
             )
-    
-            professor = st.text_input("Professor(a)")
-    
-            enviar = st.form_submit_button(
-                "🌹 Cadastrar matéria"
-            )
-    
-            if enviar:
-    
-                if nome:
-    
-                    try:
-                        supabase.table("materias").insert({
-                            "nome": nome,
-                            "semestre": semestre,
-                            "professor": professor
-                        }).execute()
-    
-                        st.success(
-                            f"'{nome}' foi salva permanentemente! 🌷"
-                        )
-    
-                        st.rerun()
-    
-                    except Exception as e:
-                        st.error("Erro ao salvar a matéria:")
-                        st.code(str(e))
-    
-                else:
-                    st.warning(
-                        "Digite o nome da matéria primeiro."
-                    )
-    
-        st.divider()
-    
-        st.subheader("📚 Disciplinas cadastradas")
-    
-        try:
-            resposta = supabase.table(
-                "materias"
-            ).select("*").execute()
-    
-            materias = resposta.data
-    
-        except Exception as e:
-            st.error("Erro ao consultar o Supabase:")
-            st.code(str(e))
-            materias = []
-    
-        if materias:
-    
-            for materia in materias:
-        
-                with st.container(
-                    border=True
-                ):
-        
-                    st.subheader(
-                        f"📚 {materia['nome']}"
-                    )
-        
-                    st.write(
-                        f"🎓 {materia['semestre']}"
-                    )
-        
-                    st.write(
-                        f"👩‍🏫 "
-                        f"{materia['professor'] or 'Professor não informado'}"
-                    )
-        
-                
-                    if st.button(
-                        "📖 Abrir matéria",
-                        key=f"abrir_{materia['id']}",
-                        use_container_width=True
-                    ):
-        
-                        st.session_state.materia_aberta = (
-                            materia["id"]
-                        )
-        
-                        st.rerun()
-        
-        
-                    col1, col2 = st.columns(2)
-            
-        
-                    with col1:
-        
-                        if st.button(
-                            "✏️ Editar",
-                            key=f"editar_{materia['id']}",
-                            use_container_width=True
-                        ):
-        
-                            st.session_state[
-                                "materia_editando"
-                            ] = materia["id"]
-        
-                            st.rerun()
-        
-        
-                    with col2:
-        
-                        if st.button(
-                            "🗑️ Excluir",
-                            key=f"excluir_{materia['id']}",
-                            use_container_width=True
-                        ):
-        
-                            supabase.table(
-                                "materias"
-                            ).delete().eq(
-                                "id",
-                                materia["id"]
-                            ).execute()
-        
-                            st.rerun()
-        
-        
-                if (
-                    st.session_state.get(
-                        "materia_editando"
-                    )
-                    == materia["id"]
-                ):
-        
-                    st.divider()
-        
-                    st.subheader(
-                        f"✏️ Editando: {materia['nome']}"
-                    )
-        
-                    with st.form(
-                        f"form_editar_{materia['id']}"
-                    ):
-        
-                        novo_nome = st.text_input(
-                            "Nome da matéria",
-                            value=materia["nome"]
-                        )
-        
-                        novo_semestre = st.selectbox(
-                            "Semestre",
-                            [
-                                "1º semestre",
-                                "2º semestre",
-                                "3º semestre",
-                                "4º semestre",
-                                "5º semestre",
-                                "6º semestre",
-                                "7º semestre",
-                                "8º semestre"
-                            ],
-                            index=[
-                                "1º semestre",
-                                "2º semestre",
-                                "3º semestre",
-                                "4º semestre",
-                                "5º semestre",
-                                "6º semestre",
-                                "7º semestre",
-                                "8º semestre"
-                            ].index(
-                                materia["semestre"]
-                            )
-                        )
-        
-                        novo_professor = st.text_input(
-                            "Professor(a)",
-                            value=materia["professor"] or ""
-                        )
-        
-        
-                        salvar = st.form_submit_button(
-                            "💾 Salvar alterações"
-                        )
-        
-        
-                        if salvar:
-        
-                            supabase.table(
-                                "materias"
-                            ).update({
-        
-                                "nome": novo_nome,
-        
-                                "semestre": novo_semestre,
-        
-                                "professor": novo_professor
-        
-                            }).eq(
-                                "id",
-                                materia["id"]
-                            ).execute()
-        
-        
-                            st.session_state[
-                                "materia_editando"
-                            ] = None
-        
-                            st.rerun()
-    
-        else:
-    
-            st.info(
-                "Você ainda não cadastrou nenhuma matéria."
+            .execute()
+        )
+
+
+        if resposta_topico.data:
+
+            topico_aberto = (
+                resposta_topico.data[0]
             )
 
+
+            # -------------------------------------------------
+            # VOLTAR PARA A MATÉRIA
+            # -------------------------------------------------
+
+            if st.button(
+                "← Voltar para a matéria"
+            ):
+
+                st.session_state.topico_aberto = None
+
+                st.rerun()
+
+
+            # -------------------------------------------------
+            # TÍTULO DA AULA
+            # -------------------------------------------------
+
+            st.title(
+                f"📖 {topico_aberto['titulo']}"
+            )
+
+
+            st.divider()
+
+
+            # -------------------------------------------------
+            # ANOTAÇÕES
+            # -------------------------------------------------
+
+            st.subheader(
+                "📝 Anotações"
+            )
+
+
+            conteudo_atual = (
+                topico_aberto["conteudo"]
+                or ""
+            )
+
+
+            with st.form(
+                f"form_anotacoes_{topico_aberto['id']}"
+            ):
+
+                novo_conteudo = st.text_area(
+                    "",
+                    value=conteudo_atual,
+                    height=550,
+                    placeholder=(
+                        "Comece a escrever suas "
+                        "anotações aqui..."
+                    ),
+                    label_visibility="collapsed"
+                )
+
+
+                salvar_conteudo = (
+                    st.form_submit_button(
+                        "💾 Salvar anotações"
+                    )
+                )
+
+
+                if salvar_conteudo:
+
+                    try:
+
+                        supabase.table(
+                            "topicos"
+                        ).update({
+                            "conteudo": novo_conteudo
+                        }).eq(
+                            "id",
+                            topico_aberto["id"]
+                        ).execute()
+
+
+                        st.success(
+                            "Anotações salvas! 📚"
+                        )
+
+                        st.rerun()
+
+
+                    except Exception as e:
+
+                        st.error(
+                            "Erro ao salvar as anotações:"
+                        )
+
+                        st.code(str(e))
+
+
+        else:
+
+            st.warning(
+                "Esta aula não foi encontrada."
+            )
+
+            st.session_state.topico_aberto = None
+
+            st.rerun()
 
 elif pagina == "⏱️ Estudar":
 
