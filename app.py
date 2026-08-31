@@ -1640,11 +1640,12 @@ elif pagina == "📚 Matérias":
             resultado_editor = editor_anotacoes(
                 data={
                     "conteudo": (
-                        topico_aberto["conteudo"]
+                        topico["conteudo"]
                         or ""
                     )
                 },
-                key=f"editor_{topico_aberto['id']}"
+                key=f"editor_{topico['id']}",
+                on_conteudo_change=lambda: None
             )
 
 
