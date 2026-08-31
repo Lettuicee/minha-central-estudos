@@ -180,32 +180,30 @@ editor_anotacoes = st.components.v2.component(
 
             botoes.forEach(
                 function(botao) {
-
+            
                     botao.addEventListener(
                         "mousedown",
                         function(evento) {
-
+            
                             evento.preventDefault();
-
+            
                             const comando =
                                 botao.dataset.comando;
-
+            
                             document.execCommand(
                                 comando,
                                 false,
                                 null
                             );
-
-                            pagina.focus();
-
+            
                             enviarConteudo();
                         }
                     );
-
+            
                 }
             );
-
-
+                
+    
             // =========================================
             // TAMANHO
             // =========================================
