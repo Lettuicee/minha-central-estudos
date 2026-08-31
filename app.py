@@ -331,6 +331,9 @@ if "materia_aberta" not in st.session_state:
 
 if "topico_aberto" not in st.session_state:
     st.session_state.topico_aberto = None
+
+if "topico_editando" not in st.session_state:
+    st.session_state.topico_editando = None
     
 st.set_page_config(
     page_title="Minha Central de Estudos",
@@ -891,22 +894,170 @@ elif pagina == "📚 Matérias":
             if topicos:
 
                 for topico in topicos:
-
-                    if st.button(
-                        f"📖 {topico['titulo']}",
-                        key=f"abrir_topico_{topico['id']}",
-                        use_container_width=True
+            
+                    with st.container(
+                        border=True
                     ):
-
-                        st.session_state.topico_aberto = (
-                            topico["id"]
+            
+                        col1, col2, col3 = st.columns(
+                            [6, 1, 1]
                         )
-
-                        st.rerun()
-
-
+            
+            
+                        # =====================================
+                        # ABRIR AULA
+                        # =====================================
+            
+                        with col1:
+            
+                            if st.button(
+                                f"📖 {topico['titulo']}",
+                                key=f"abrir_topico_{topico['id']}",
+                                width="stretch"
+                            ):
+            
+                                st.session_state.topico_aberto = (
+                                    topico["id"]
+                                )
+            
+                                st.rerun()
+            
+            
+                        # =====================================
+                        # EDITAR
+                        # =====================================
+            
+                        with col2:
+            
+                            if st.button(
+                                "✏️",
+                                key=f"editar_topico_{topico['id']}",
+                                help="Editar nome da aula"
+                            ):
+            
+                                st.session_state[
+                                    "topico_editando"
+                                ] = topico["id"]
+            
+                                st.rerun()
+            
+            
+                        # =====================================
+                        # EXCLUIR
+                        # =====================================
+            
+                        with col3:
+            
+                            if st.button(
+                                "🗑️",
+                                key=f"excluir_topico_{topico['id']}",
+                                help="Excluir aula"
+                            ):
+            
+                                try:
+            
+                                    supabase.table(
+                                        "topicos"
+                                    ).delete().eq(
+                                        "id",
+                                        topico["id"]
+                                    ).execute()
+            
+            
+                                    if (
+                                        st.session_state.get(
+                                            "topico_editando"
+                                        )
+                                        == topico["id"]
+                                    ):
+            
+                                        st.session_state[
+                                            "topico_editando"
+                                        ] = None
+            
+            
+                                    st.rerun()
+            
+            
+                                except Exception as e:
+            
+                                    st.error(
+                                        "Erro ao excluir a aula:"
+                                    )
+            
+                                    st.code(str(e))
+            
+            
+                    # =========================================
+                    # FORMULÁRIO DE EDIÇÃO
+                    # =========================================
+            
+                    if (
+                        st.session_state.get(
+                            "topico_editando"
+                        )
+                        == topico["id"]
+                    ):
+            
+                        with st.form(
+                            f"form_editar_topico_{topico['id']}"
+                        ):
+            
+                            novo_titulo = st.text_input(
+                                "Nome da aula",
+                                value=topico["titulo"]
+                            )
+            
+            
+                            salvar_edicao = (
+                                st.form_submit_button(
+                                    "💾 Salvar nome"
+                                )
+                            )
+            
+            
+                            if salvar_edicao:
+            
+                                if novo_titulo.strip():
+            
+                                    try:
+            
+                                        supabase.table(
+                                            "topicos"
+                                        ).update({
+                                            "titulo": novo_titulo
+                                        }).eq(
+                                            "id",
+                                            topico["id"]
+                                        ).execute()
+            
+            
+                                        st.session_state[
+                                            "topico_editando"
+                                        ] = None
+            
+            
+                                        st.rerun()
+            
+            
+                                    except Exception as e:
+            
+                                        st.error(
+                                            "Erro ao editar a aula:"
+                                        )
+            
+                                        st.code(str(e))
+            
+                                else:
+            
+                                    st.warning(
+                                        "O nome da aula não pode "
+                                        "ficar vazio."
+                                    )
+            
+            
             else:
-
+            
                 st.info(
                     "Você ainda não adicionou nenhum "
                     "tópico nesta matéria."
